@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Vamsham - Family Tree Builder</title>
+    <script>
+      window.tailwind = {
+        config: {
+          // Custom configurations can be appended here
+        }
+      }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+        body { 
+            font-family: 'Inter', sans-serif; 
+            overscroll-behavior: none; 
+            -webkit-overflow-scrolling: touch;
+        }
+        .font-serif { font-family: 'Cinzel', serif; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1a1610; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #44392a; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #d4af37; }
+
+        /* ADVANCED PRINT ENGINE PIPELINE OVERRIDES */
+        @media print {
+            @page { size: landscape; margin: 0mm; }
+            body, html { 
+                background: #120f0a !important; 
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact;
+                width: 100% !important;
+                height: 100% !important;
+                overflow: hidden !important;
+            }
+            .no-print, #mobile-top-bar, #sidebar-overlay { display: none !important; }
+            #main-layout { display: none !important; }
+            
+            #print-wrapper { 
+                display: block !important; 
+                width: 100vw !important; 
+                height: 100vh !important; 
+                background: #120f0a !important;
+                padding: 10mm !important;
+                box-sizing: border-box !important;
+            }
+            #print-wrapper img { 
+                width: 100% !important; 
+                height: auto !important; 
+                object-fit: contain !important;
+                display: block !important;
+            }
+        }
+        @media screen {
+            #print-wrapper { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-[#120f0a] text-[#eadeca] overflow-hidden select-none">
+
+    <div id="print-wrapper"></div>
+
+    <div id="mobile-top-bar" class="md:hidden bg-[#1a1610] w-full p-4 flex justify-between items-center border-b border-[#2a241a] z-20 shrink-0">
+        <div>
+            <h1 class="text-xl font-serif tracking-widest text-[#d4af37] font-bold">VAMSHAM</h1>
+        </div>
+        <button onclick="toggleMobileSidebar()" class="bg-[#221d15] px-3 py-1.5 rounded border border-[#3c3325] text-xs font-bold text-amber-400">
+            ☰ Menu
+        </button>
+    </div>
+
+    <div id="sidebar-overlay" onclick="toggleMobileSidebar()" class="hidden fixed inset-0 bg-black/70 z-20 md:hidden transition-opacity"></div>
+
+    <div id="main-layout" class="flex flex-col md:flex-row h-[calc(100vh-61px)] md:h-screen w-screen overflow-hidden relative">
+        
+        <div class="no-print fixed md:relative inset-y-0 left-0 z-30 w-80 bg-[#1a1610] border-r border-[#2a241a] flex flex-col justify-between p-5 shadow-2xl shrink-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out h-full">
+            <div class="flex flex-col h-[calc(100vh-190px)] md:h-[calc(100vh-175px)]">
+                <div class="mb-4 flex justify-between items-center shrink-0">
+                    <div>
+                        <h1 class="text-2xl font-serif tracking-widest text-[#d4af37] font-bold hidden md:block">VAMSHAM</h1>
+                        <p class="text-[10px] text-amber-200/40 uppercase tracking-widest">Family Tree Workspace</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="bg-[#2a2318] text-[#d4af37] border border-[#d4af37]/30 text-xs px-2 py-0.5 rounded-full font-mono">v2.2</span>
+                        <button onclick="toggleMobileSidebar()" class="md:hidden text-gray-400 text-sm p-1">✕ Close</button>
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-y-auto custom-scrollbar pr-1 space-y-4">
+                    <form id="member-form" class="space-y-3 bg-[#221d15] p-3 rounded-lg border border-[#383023]">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-amber-400/80">Add Family Member</h3>
+                        
+                        <input 
+                            type="text" 
+                            id="member-name"
+                            placeholder="Full Name" 
+                            class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none focus:border-[#d4af37] text-amber-100"
+                            required
+                        />
+
+                        <div>
+                            <label class="text-[10px] text-amber-200/50 block mb-1">Gender</label>
+                            <div class="grid grid-cols-2 gap-1 bg-[#120f0a] p-1 rounded border border-[#44392a]">
+                                <button type="button" onclick="setGender('M')" id="btn-gender-m" class="text-[10px] py-1 rounded transition-all bg-[#d4af37] text-[#120f0a] font-bold">Male</button>
+                                <button type="button" onclick="setGender('F')" id="btn-gender-f" class="text-[10px] py-1 rounded transition-all text-gray-400">Female</button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[10px] text-amber-200/50 block mb-1">Birth Year</label>
+                                <input 
+                                    type="number" 
+                                    id="member-birth"
+                                    placeholder="e.g. 1950" 
+                                    class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none focus:border-[#d4af37] text-amber-100"
+                                />
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-amber-200/50 block mb-1">Death Year (Optional)</label>
+                                <input 
+                                    type="number" 
+                                    id="member-death"
+                                    placeholder="Leave blank if alive" 
+                                    class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none focus:border-[#d4af37] text-amber-100"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-[10px] text-amber-200/50 block mb-1">Bio / Historic Info</label>
+                            <textarea 
+                                id="member-bio"
+                                rows="2"
+                                placeholder="Short notes, profession, or origins..." 
+                                class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none focus:border-[#d4af37] text-amber-100 custom-scrollbar resize-none"
+                            ></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-1 bg-[#120f0a] p-1 rounded border border-[#44392a]">
+                            <button type="button" onclick="setLinkType('none')" id="btn-link-none" class="text-[10px] py-1 rounded transition-all bg-[#d4af37] text-[#120f0a] font-bold">Standalone</button>
+                            <button type="button" onclick="setLinkType('spouse')" id="btn-link-spouse" class="text-[10px] py-1 rounded transition-all text-gray-400">Is Spouse</button>
+                            <button type="button" onclick="setLinkType('child')" id="btn-link-child" class="text-[10px] py-1 rounded transition-all text-gray-400">Is Child</button>
+                        </div>
+
+                        <div id="target-selector-container" class="hidden">
+                            <select 
+                                id="target-member-id"
+                                class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none text-amber-200/80"
+                            >
+                                </select>
+                        </div>
+
+                        <button type="submit" class="w-full bg-[#d4af37] text-[#120f0a] text-xs font-bold py-2 rounded flex items-center justify-center gap-1 hover:bg-[#e6c24a] transition-all cursor-pointer">
+                            + Insert Node
+                        </button>
+                    </form>
+
+                    <div class="space-y-1">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-amber-500/50 mb-2">Indexed Directory (<span id="directory-count">0</span>)</h3>
+                        <div id="directory-list" class="space-y-1.5">
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-2 pt-3 border-t border-[#2a241a] shrink-0 bg-[#1a1610]">
+                <div class="bg-[#16120d] p-2 rounded-lg border border-[#2d251c] space-y-1.5">
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-amber-500/40 text-center">Data Portability</p>
+                    <div class="grid grid-cols-2 gap-1.5 text-[11px]">
+                        <button onclick="exportJSONData()" class="bg-[#221d15] p-1.5 rounded text-center border border-[#3c3325] text-amber-200 hover:text-white hover:bg-[#2d261d] transition-all cursor-pointer">Export Data</button>
+                        <button onclick="triggerJSONImport()" class="bg-[#221d15] p-1.5 rounded text-center border border-[#3c3325] text-amber-200 hover:text-white hover:bg-[#2d261d] transition-all cursor-pointer">Import Data</button>
+                    </div>
+                    <input type="file" id="import-file-element" accept=".json" class="hidden" onchange="handleJSONImport(event)" />
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <button onclick="exportPNG()" class="bg-[#221d15] p-2 rounded text-center border border-[#332b20] hover:bg-[#2e271d] hover:text-[#d4af37] transition-all cursor-pointer font-medium">Export PNG</button>
+                    <button onclick="exportPDF()" class="bg-[#221d15] p-2 rounded text-center border border-[#332b20] hover:bg-[#2e271d] hover:text-[#d4af37] transition-all cursor-pointer font-medium">Export PDF</button>
+                </div>
+                <button onclick="clearAllData()" class="w-full bg-red-950/40 text-red-400 hover:bg-red-900/60 border border-red-900/40 text-xs p-2 rounded text-center transition-all cursor-pointer font-medium">
+                    Clear Workspace Data
+                </button>
+            </div>
+        </div>
+
+        <div id="canvas-container" class="flex-1 relative bg-[radial-gradient(#262017_1.5px,transparent_1.5px)] [background-size:32px_32px] flex flex-col justify-between items-center p-4 md:p-8 overflow-auto custom-scrollbar">
+            
+            <div id="canvas-content" class="w-max px-6 md:px-16 mx-auto flex flex-col items-center justify-start min-h-[75vh] space-y-12 py-4">
+                </div>
+
+            <div class="no-print w-full flex justify-between items-center text-[11px] text-amber-100/40 border-t border-[#221d15] pt-4 mt-8 shrink-0">
+                <p>Vamsham Node Sandbox Engine (Mobile Optimization Engine Active)</p>
+                <p class="hidden md:block">Press Ctrl+P / Cmd+P alternative target shortcut</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="edit-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+        <div class="bg-[#1a1610] border border-[#d4af37]/40 w-full max-w-md rounded-xl p-6 shadow-2xl space-y-4">
+            <div class="border-b border-[#2a241a] pb-2">
+                <h3 class="text-base font-serif tracking-wide text-[#d4af37] font-bold">Edit Person Details</h3>
+                <p class="text-[10px] text-gray-500">Modify properties or delete this entry from the tree.</p>
+            </div>
+
+            <form id="edit-form" class="space-y-3">
+                <input type="hidden" id="edit-member-id" />
+                
+                <div>
+                    <label class="text-[10px] text-amber-200/50 block mb-1">Full Name</label>
+                    <input type="text" id="edit-name" class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none focus:border-[#d4af37] text-amber-100" required />
+                </div>
+
+                <div>
+                    <label class="text-[10px] text-amber-200/50 block mb-1">Gender</label>
+                    <div class="grid grid-cols-2 gap-1 bg-[#120f0a] p-1 rounded border border-[#44392a]">
+                        <button type="button" onclick="setEditGender('M')" id="btn-edit-gender-m" class="text-[10px] py-1 rounded transition-all">Male</button>
+                        <button type="button" onclick="setEditGender('F')" id="btn-edit-gender-f" class="text-[10px] py-1 rounded transition-all">Female</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[10px] text-amber-200/50 block mb-1">Birth Year</label>
+                        <input type="number" id="edit-birth" class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none focus:border-[#d4af37] text-amber-100" />
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-amber-200/50 block mb-1">Death Year</label>
+                        <input type="number" id="edit-death" placeholder="Blank if alive" class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none focus:border-[#d4af37] text-amber-100" />
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[10px] text-amber-200/50 block mb-1">Bio / Historic Info</label>
+                    <textarea id="edit-bio" rows="3" class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none focus:border-[#d4af37] text-amber-100 custom-scrollbar resize-none"></textarea>
+                </div>
+
+                <div class="flex gap-2 pt-2 justify-between items-center text-xs border-t border-[#2a241a]">
+                    <button type="button" onclick="deleteMemberTrigger()" class="bg-red-950/40 text-red-400 hover:bg-red-900/60 border border-red-900/40 px-3 py-2 rounded transition-all cursor-pointer font-medium">
+                        Delete Person
+                    </button>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="closeEditModal()" class="bg-[#221d15] px-4 py-2 rounded border border-[#332b20] hover:bg-[#2e271d] transition-all cursor-pointer">Cancel</button>
+                        <button type="submit" class="bg-[#d4af37] text-[#120f0a] font-bold px-5 py-2 rounded hover:bg-[#e6c24a] transition-all cursor-pointer">Save Changes</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let state = {
+            members: [
+                { id: 'm1', name: 'Lakshmanan D S', gender: 'M', birth: '1938', death: '2018', bio: 'Station Master', role: 'Root Parent' },
+                { id: 'm2', name: 'Pattammal L', gender: 'F', birth: '1944', death: '', bio: 'Home maker', role: 'Root Parent' },
+                { id: 'm3', name: 'Nagarajan D L', gender: 'M', birth: '', death: '', bio: '', role: 'Child Node' },
+                { id: 'm4', name: 'Seenuvasan D L', gender: 'M', birth: '', death: '', bio: 'HVF', role: 'Child Node' },
+                { id: 'm5', name: 'Rajalakshmi A', gender: 'F', birth: '', death: '', bio: 'Home maker', role: 'Child Node' },
+                { id: 'm6', name: 'Vasudevan D L', gender: 'M', birth: '', death: '', bio: 'HVF', role: 'Child Node' },
+                { id: 'm7', name: 'Jayalakshmi B', gender: 'F', birth: '', death: '', bio: 'Teacher', role: 'Child Node' },
+                { id: 'm8', name: 'Rajasekaran D L', gender: 'M', birth: '1959', death: '', bio: 'Self Entrepreneur', role: 'Child Node' },
+                { id: 'm9', name: 'Lakshmi R', gender: 'F', birth: '1964', death: '', bio: 'Teacher', role: 'Spouse Entry' },
+                { id: 'm10', name: 'Geetha', gender: 'F', birth: '', death: '', bio: '', role: 'Spouse Entry' },
+                { id: 'm11', name: 'Kunthalambal', gender: 'F', birth: '', death: '', bio: 'Home maker', role: 'Spouse Entry' },
+                { id: 'm12', name: 'Karthik D R', gender: 'M', birth: '1988', death: '', bio: 'Technical Project Manager', role: 'Child Node' }
+            ],
+            unions: [
+                { id: 'u1', partnerA: 'm1', partnerB: 'm2', children: ['m3', 'm4', 'm5', 'm6', 'm7', 'm8'] },
+                { id: 'u2', partnerA: 'm8', partnerB: 'm9', children: ['m12'] },
+                { id: 'u3', partnerA: 'm4', partnerB: 'm10', children: [] },
+                { id: 'u4', partnerA: 'm3', partnerB: 'm11', children: [] }
+            ]
+        };
+
+        const LOCAL_STORAGE_KEY = 'vamsham_family_tree_state';
+        let currentLinkType = 'none';
+        let currentGender = 'M';
+        let modalEditingGender = 'M';
+
+        // MOBILE SIDEBAR DRAWER TOGGLE ENGINE
+        function toggleMobileSidebar() {
+            if (window.innerWidth >= 768) return; // Ignore if on desktop grid frames
+            const sidebar = document.querySelector('.no-print.w-80');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function loadFromLocalStorage() {
+            const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+            if (storedData) {
+                try {
+                    const parsed = JSON.parse(storedData);
+                    if (parsed.members && parsed.unions) {
+                        state = parsed;
+                    }
+                } catch (e) {
+                    console.error("Local storage initialization error.", e);
+                }
+            }
+        }
+
+        function exportJSONData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "vamsham-family-data.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function triggerJSONImport() {
+            document.getElementById('import-file-element').click();
+        }
+
+        function handleJSONImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedState = JSON.parse(e.target.result);
+                    if (importedState.members && importedState.unions) {
+                        state = importedState;
+                        saveToLocalStorage();
+                        renderWorkspace();
+                        populateDropdown();
+                        alert("Family dataset successfully parsed and mapped.");
+                        if (window.innerWidth < 768) toggleMobileSidebar();
+                    } else {
+                        alert("Malformed data context layout.");
+                    }
+                } catch (err) {
+                    alert("Unable to decode the chosen backup file.");
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function setGender(g) {
+            currentGender = g;
+            const btnM = document.getElementById('btn-gender-m');
+            const btnF = document.getElementById('btn-gender-f');
+            if (g === 'M') {
+                btnM.className = "text-[10px] py-1 rounded transition-all bg-[#d4af37] text-[#120f0a] font-bold";
+                btnF.className = "text-[10px] py-1 rounded transition-all text-gray-400";
+            } else {
+                btnF.className = "text-[10px] py-1 rounded transition-all bg-[#d4af37] text-[#120f0a] font-bold";
+                btnM.className = "text-[10px] py-1 rounded transition-all text-gray-400";
+            }
+        }
+
+        function setEditGender(g) {
+            modalEditingGender = g;
+            const btnM = document.getElementById('btn-edit-gender-m');
+            const btnF = document.getElementById('btn-edit-gender-f');
+            if (g === 'M') {
+                btnM.className = "text-[10px] py-1 rounded transition-all bg-[#d4af37] text-[#120f0a] font-bold";
+                btnF.className = "text-[10px] py-1 rounded transition-all bg-[#120f0a] text-gray-400";
+            } else {
+                btnF.className = "text-[10px] py-1 rounded transition-all bg-[#d4af37] text-[#120f0a] font-bold";
+                btnM.className = "text-[10px] py-1 rounded transition-all bg-[#120f0a] text-gray-400";
+            }
+        }
+
+        function setLinkType(type) {
+            currentLinkType = type;
+            ['none', 'spouse', 'child'].forEach(t => {
+                const btn = document.getElementById(`btn-link-${t}`);
+                btn.className = (t === type) ? "text-[10px] py-1 rounded transition-all bg-[#d4af37] text-[#120f0a] font-bold" : "text-[10px] py-1 rounded transition-all text-gray-400";
+            });
+
+            const container = document.getElementById('target-selector-container');
+            if (type === 'none') {
+                container.classList.add('hidden');
+            } else {
+                container.classList.remove('hidden');
+                populateDropdown();
+            }
+        }
+
+        function populateDropdown() {
+            const select = document.getElementById('target-member-id');
+            select.innerHTML = '<option value="">Select Relational Match...</option>';
+            state.members.forEach(m => {
+                select.innerHTML += `<option value="${m.id}">${m.name}</option>`;
+            });
+        }
+
+        function formatLifespan(birth, death) {
+            if (!birth) return '';
+            return death ? `(${birth} — ${death})` : `(b. ${birth})`;
+        }
+
+        function getGenderClasses(gender) {
+            if (gender === 'F') {
+                return { text: 'text-pink-200', subtext: 'text-pink-400/60', border: 'border-pink-500/30' };
+            }
+            return { text: 'text-blue-200', subtext: 'text-blue-400/60', border: 'border-blue-500/30' };
+        }
+
+        function openEditModal(id) {
+            if(!id) return;
+            const member = state.members.find(m => m.id === id);
+            if (!member) return;
+
+            document.getElementById('edit-member-id').value = member.id;
+            document.getElementById('edit-name').value = member.name;
+            document.getElementById('edit-birth').value = member.birth || '';
+            document.getElementById('edit-death').value = member.death || '';
+            document.getElementById('edit-bio').value = member.bio || '';
+            
+            setEditGender(member.gender || 'M');
+            document.getElementById('edit-modal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.add('hidden');
+        }
+
+        function deleteMemberTrigger() {
+            const id = document.getElementById('edit-member-id').value;
+            const member = state.members.find(m => m.id === id);
+            if (!member) return;
+
+            if (confirm(`Are you sure you want to remove ${member.name}?`)) {
+                state.members = state.members.filter(m => m.id !== id);
+                state.unions = state.unions.map(u => {
+                    if (u.partnerA === id) u.partnerA = null;
+                    if (u.partnerB === id) u.partnerB = null;
+                    if (u.children) u.children = u.children.filter(childId => childId !== id);
+                    return u;
+                }).filter(u => u.partnerA || u.partnerB || (u.children && u.children.length > 0));
+
+                saveToLocalStorage();
+                closeEditModal();
+                renderWorkspace();
+                populateDropdown();
+            }
+        }
+
+        document.getElementById('edit-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-member-id').value;
+            const member = state.members.find(m => m.id === id);
+            
+            if (member) {
+                member.name = document.getElementById('edit-name').value.trim();
+                member.gender = modalEditingGender;
+                member.birth = document.getElementById('edit-birth').value.trim();
+                member.death = document.getElementById('edit-death').value.trim();
+                member.bio = document.getElementById('edit-bio').value.trim();
+                
+                saveToLocalStorage();
+                renderWorkspace();
+                closeEditModal();
+            }
+        });
+
+        // RECURSIVE TREE GENERATOR LAYOUT LOGIC
+        function buildTreeHTML(node, isChild = false) {
+            if (node.name) {
+                const colors = getGenderClasses(node.gender);
+                return `
+                    <div class="relative flex flex-col items-center shrink-0">
+                        ${isChild ? `<div class="w-[2px] h-4 bg-[#d4af37]/30 mb-2"></div>` : ''}
+                        <div onclick="openEditModal('${node.id}')" class="cursor-pointer px-4 py-3 bg-[#221d15] border ${colors.border} rounded-lg text-center shadow-md w-[170px] md:w-[200px] hover:border-amber-400 transition-all">
+                            <p class="text-xs font-bold ${colors.text} truncate">${node.name}</p>
+                            <p class="text-[10px] text-amber-400/60 font-mono mt-0.5">${formatLifespan(node.birth, node.death)}</p>
+                            ${node.bio ? `<p class="text-[10px] text-gray-400 mt-2 border-t border-[#3a3124] pt-1 text-left leading-relaxed italic h-auto w-full break-words whitespace-normal">${node.bio}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            const partnerA = state.members.find(m => m.id === node.partnerA);
+            const partnerB = state.members.find(m => m.id === node.partnerB);
+            const pAColors = partnerA ? getGenderClasses(partnerA.gender) : { text: 'text-gray-500', subtext: 'text-gray-600' };
+            const pBColors = partnerB ? getGenderClasses(partnerB.gender) : { text: 'text-gray-500', subtext: 'text-gray-600' };
+
+            let childrenHTML = '';
+            if (node.children && node.children.length > 0) {
+                let childrenElementsHTML = '';
+                node.children.forEach(childId => {
+                    const childUnion = state.unions.find(u => u.partnerA === childId || u.partnerB === childId);
+                    if (childUnion) {
+                        childrenElementsHTML += buildTreeHTML(childUnion, true);
+                    } else {
+                        const childMember = state.members.find(m => m.id === childId);
+                        if (childMember) childrenElementsHTML += buildTreeHTML(childMember, true);
+                    }
+                });
+
+                childrenHTML = `
+                    <div class="w-full flex flex-col items-center mt-4">
+                        <div class="w-[2px] h-4 bg-[#d4af37]/30"></div>
+                        <div class="flex gap-4 md:gap-6 justify-center items-start border-t border-[#d4af37]/30 relative pt-4 px-2 md:px-4">
+                            ${childrenElementsHTML}
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="flex flex-col items-center relative shrink-0">
+                    ${isChild ? `<div class="w-[2px] h-4 bg-[#d4af37]/30 mb-2"></div>` : ''}
+                    <div class="flex items-stretch gap-2 md:gap-4 bg-[#1a1610]/90 p-3 md:p-4 rounded-xl border border-[#d4af37]/40 shadow-[0_0_20px_rgba(212,175,55,0.05)]">
+                        <div onclick="openEditModal('${partnerA ? partnerA.id : ''}')" class="cursor-pointer text-center w-[135px] md:w-[165px] flex flex-col justify-between p-1 rounded hover:bg-[#221d15]/50 transition-colors">
+                            <div>
+                                <p class="text-xs font-bold ${pAColors.text} tracking-wide truncate">${partnerA ? partnerA.name : 'Unknown/Removed'}</p>
+                                <p class="text-[10px] ${pAColors.subtext} font-mono mt-0.5">${partnerA ? formatLifespan(partnerA.birth, partnerA.death) : ''}</p>
+                            </div>
+                            ${partnerA && partnerA.bio ? `<p class="text-[10px] text-gray-400 mt-2 border-t border-[#322a1e] pt-1 text-left italic leading-normal h-auto w-full break-words whitespace-normal">${partnerA.bio}</p>` : ''}
+                        </div>
+                        
+                        ${partnerB || partnerA ? `
+                            <div class="text-amber-500 font-serif text-lg md:text-xl flex items-center px-0.5">×</div>
+                            <div onclick="openEditModal('${partnerB ? partnerB.id : ''}')" class="cursor-pointer text-center w-[135px] md:w-[165px] flex flex-col justify-between p-1 rounded hover:bg-[#221d15]/50 transition-colors">
+                                <div>
+                                    <p class="text-xs font-bold ${pBColors.text} tracking-wide truncate">${partnerB ? partnerB.name : 'Unknown/Removed'}</p>
+                                    <p class="text-[10px] ${pBColors.subtext} font-mono mt-0.5">${partnerB ? formatLifespan(partnerB.birth, partnerB.death) : ''}</p>
+                                </div>
+                                ${partnerB && partnerB.bio ? `<p class="text-[10px] text-gray-400 mt-2 border-t border-[#322a1e] pt-1 text-left italic leading-normal h-auto w-full break-words whitespace-normal">${partnerB.bio}</p>` : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                    ${childrenHTML}
+                </div>
+            `;
+        }
+
+        function renderWorkspace() {
+            document.getElementById('directory-count').innerText = state.members.length;
+
+            const directoryList = document.getElementById('directory-list');
+            directoryList.innerHTML = '';
+            state.members.forEach(m => {
+                const ageStr = formatLifespan(m.birth, m.death);
+                const genderLabel = m.gender === 'F' ? '🌸 F' : '🔷 M';
+                directoryList.innerHTML += `
+                    <div class="p-2 text-xs bg-[#1f1a13] rounded border border-[#2d251b] flex items-center justify-between hover:border-[#d4af37]/40 transition-all">
+                        <div class="truncate max-w-[190px]">
+                            <span class="truncate font-medium text-gray-300 block">${m.name}</span>
+                            <p class="text-[10px] text-amber-400/40 font-mono">${genderLabel} ${ageStr}</p>
+                        </div>
+                        <button onclick="openEditModal('${m.id}')" class="text-gray-500 hover:text-[#d4af37] p-1 cursor-pointer transition-colors" title="Edit Properties">✏️</button>
+                    </div>
+                `;
+            });
+
+            const canvas = document.getElementById('canvas-content');
+            canvas.innerHTML = `
+                <div class="text-center no-print hidden md:block">
+                    <p class="text-xs text-amber-400/40 tracking-widest uppercase mb-1">Canvas Sandbox View</p>
+                    <div class="h-[1px] w-12 bg-[#d4af37]/30 mx-auto"></div>
+                </div>
+                <div class="w-full flex flex-col items-center gap-12 md:gap-16" id="tree-nodes-wrapper"></div>
+            `;
+
+            const wrapper = document.getElementById('tree-nodes-wrapper');
+
+            const childIds = new Set(state.unions.flatMap(u => u.children || []));
+            const rootUnions = state.unions.filter(u => !childIds.has(u.partnerA) && !childIds.has(u.partnerB));
+            const rootIsolated = state.members.filter(m => {
+                const inUnion = state.unions.some(u => u.partnerA === m.id || u.partnerB === m.id);
+                return !inUnion && !childIds.has(m.id);
+            });
+
+            rootUnions.forEach(u => { wrapper.innerHTML += buildTreeHTML(u, false); });
+            rootIsolated.forEach(im => { wrapper.innerHTML += buildTreeHTML(im, false); });
+        }
+
+        // Form Submit Management
+        document.getElementById('member-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nameField = document.getElementById('member-name');
+            const birthField = document.getElementById('member-birth');
+            const deathField = document.getElementById('member-death');
+            const bioField = document.getElementById('member-bio');
+            const targetSelect = document.getElementById('target-member-id');
+            
+            const name = nameField.value.trim();
+            if (!name) return;
+
+            const newId = `m_${Date.now()}`;
+            let assignedRole = 'Root Tree';
+
+            if (currentLinkType === 'child' && targetSelect.value) assignedRole = 'Child Node';
+            if (currentLinkType === 'spouse' && targetSelect.value) assignedRole = 'Spouse Entry';
+
+            state.members.push({ 
+                id: newId, name: name, gender: currentGender,
+                birth: birthField.value.trim(), death: deathField.value.trim(), 
+                bio: bioField.value.trim(), role: assignedRole 
+            });
+
+            if (currentLinkType === 'spouse' && targetSelect.value) {
+                state.unions.push({ id: `u_${Date.now()}`, partnerA: targetSelect.value, partnerB: newId, children: [] });
+            } else if (currentLinkType === 'child' && targetSelect.value) {
+                const targetId = targetSelect.value;
+                const existingUnion = state.unions.find(u => u.partnerA === targetId || u.partnerB === targetId);
+                if (existingUnion) {
+                    existingUnion.children.push(newId);
+                } else {
+                    state.unions.push({ id: `u_${Date.now()}`, partnerA: targetId, partnerB: null, children: [newId] });
+                }
+            }
+
+            nameField.value = ''; birthField.value = ''; deathField.value = ''; bioField.value = '';
+            setGender('M'); setLinkType('none');
+            
+            saveToLocalStorage();
+            renderWorkspace();
+            if (window.innerWidth < 768) toggleMobileSidebar(); // Hide drawer on node insert completion
+        });
+
+        function clearAllData() {
+            if (confirm("Are you sure you want to clear your entire family tree construction space?")) {
+                state.members = []; state.unions = [];
+                saveToLocalStorage();
+                renderWorkspace(); populateDropdown();
+                if (window.innerWidth < 768) toggleMobileSidebar();
+            }
+        }
+
+        function getFullCanvasBounds() {
+            const target = document.getElementById('canvas-content');
+            return {
+                width: target.scrollWidth + 100,
+                height: target.scrollHeight + 100
+            };
+        }
+
+        function exportPNG() {
+            const target = document.getElementById('canvas-content');
+            const btn = document.querySelector('button[onclick="exportPNG()"]');
+            btn.innerText = "Capturing...";
+            
+            const bounds = getFullCanvasBounds();
+
+            html2canvas(target, { 
+                backgroundColor: '#120f0a', 
+                scale: 2, 
+                logging: false,
+                width: bounds.width,
+                height: bounds.height,
+                windowWidth: bounds.width,
+                windowHeight: bounds.height,
+                x: 0,
+                y: 0
+            }).then(canvas => {
+                const downloadLink = document.createElement('a');
+                downloadLink.download = 'vamsham-family-tree.png';
+                downloadLink.href = canvas.toDataURL('image/png');
+                downloadLink.click();
+                btn.innerText = "Export PNG";
+            }).catch(err => {
+                alert("PNG capture configuration internal error.");
+                btn.innerText = "Export PNG";
+            });
+        }
+
+        function exportPDF() {
+            const target = document.getElementById('canvas-content');
+            const btn = document.querySelector('button[onclick="exportPDF()"]');
+            const originalText = btn.innerText;
+            btn.innerText = "Preparing PDF...";
+
+            const bounds = getFullCanvasBounds();
+
+            html2canvas(target, { 
+                backgroundColor: '#120f0a', 
+                scale: 2.5, 
+                logging: false,
+                width: bounds.width,
+                height: bounds.height,
+                windowWidth: bounds.width,
+                windowHeight: bounds.height,
+                x: 0,
+                y: 0
+            }).then(canvas => {
+                const printWrapper = document.getElementById('print-wrapper');
+                printWrapper.innerHTML = ''; 
+                
+                const img = document.createElement('img');
+                img.src = canvas.toDataURL('image/png');
+                printWrapper.appendChild(img);
+
+                setTimeout(() => {
+                    window.print();
+                    btn.innerText = originalText;
+                    printWrapper.innerHTML = ''; 
+                }, 400);
+
+            }).catch(err => {
+                alert("PDF system printing compilation driver failed.");
+                btn.innerText = originalText;
+            });
+        }
+
+        // Initialize App Workflow Sequence
+        loadFromLocalStorage();
+        renderWorkspace();
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Vamsham - Family Tree Builder</title>
+    <script>
+      window.tailwind = {
+        config: {
+          // Custom configurations can be appended here
+        }
+      }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
+        body { 
+            font-family: 'Inter', sans-serif; 
+            overscroll-behavior: none; 
+            -webkit-overflow-scrolling: touch;
+        }
+        .font-serif { font-family: 'Cinzel', serif; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1a1610; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #44392a; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #d4af37; }
+
+        /* ADVANCED PRINT ENGINE PIPELINE OVERRIDES */
+        @media print {
+            @page { size: landscape; margin: 0mm; }
+            body, html { 
+                background: #120f0a !important; 
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact;
+                width: 100% !important;
+                height: 100% !important;
+                overflow: hidden !important;
+            }
+            .no-print, #mobile-top-bar, #sidebar-overlay { display: none !important; }
+            #main-layout { display: none !important; }
+            
+            #print-wrapper { 
+                display: block !important; 
+                width: 100vw !important; 
+                height: 100vh !important; 
+                background: #120f0a !important;
+                padding: 10mm !important;
+                box-sizing: border-box !important;
+            }
+            #print-wrapper img { 
+                width: 100% !important; 
+                height: auto !important; 
+                object-fit: contain !important;
+                display: block !important;
+            }
+        }
+        @media screen {
+            #print-wrapper { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-[#120f0a] text-[#eadeca] overflow-hidden select-none">
+
+    <div id="print-wrapper"></div>
+
+    <div id="mobile-top-bar" class="md:hidden bg-[#1a1610] w-full p-4 flex justify-between items-center border-b border-[#2a241a] z-20 shrink-0">
+        <div>
+            <h1 class="text-xl font-serif tracking-widest text-[#d4af37] font-bold">VAMSHAM</h1>
+        </div>
+        <button onclick="toggleMobileSidebar()" class="bg-[#221d15] px-3 py-1.5 rounded border border-[#3c3325] text-xs font-bold text-amber-400">
+            ☰ Menu
+        </button>
+    </div>
+
+    <div id="sidebar-overlay" onclick="toggleMobileSidebar()" class="hidden fixed inset-0 bg-black/70 z-20 md:hidden transition-opacity"></div>
+
+    <div id="main-layout" class="flex flex-col md:flex-row h-[calc(100vh-61px)] md:h-screen w-screen overflow-hidden relative">
+        
+        <div class="no-print fixed md:relative inset-y-0 left-0 z-30 w-80 bg-[#1a1610] border-r border-[#2a241a] flex flex-col justify-between p-5 shadow-2xl shrink-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out h-full">
+            <div class="flex flex-col h-[calc(100vh-190px)] md:h-[calc(100vh-175px)]">
+                <div class="mb-4 flex justify-between items-center shrink-0">
+                    <div>
+                        <h1 class="text-2xl font-serif tracking-widest text-[#d4af37] font-bold hidden md:block">VAMSHAM</h1>
+                        <p class="text-[10px] text-amber-200/40 uppercase tracking-widest">Family Tree Workspace</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="bg-[#2a2318] text-[#d4af37] border border-[#d4af37]/30 text-xs px-2 py-0.5 rounded-full font-mono">v2.2</span>
+                        <button onclick="toggleMobileSidebar()" class="md:hidden text-gray-400 text-sm p-1">✕ Close</button>
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-y-auto custom-scrollbar pr-1 space-y-4">
+                    <form id="member-form" class="space-y-3 bg-[#221d15] p-3 rounded-lg border border-[#383023]">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-amber-400/80">Add Family Member</h3>
+                        
+                        <input 
+                            type="text" 
+                            id="member-name"
+                            placeholder="Full Name" 
+                            class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none focus:border-[#d4af37] text-amber-100"
+                            required
+                        />
+
+                        <div>
+                            <label class="text-[10px] text-amber-200/50 block mb-1">Gender</label>
+                            <div class="grid grid-cols-2 gap-1 bg-[#120f0a] p-1 rounded border border-[#44392a]">
+                                <button type="button" onclick="setGender('M')" id="btn-gender-m" class="text-[10px] py-1 rounded transition-all bg-[#d4af37] text-[#120f0a] font-bold">Male</button>
+                                <button type="button" onclick="setGender('F')" id="btn-gender-f" class="text-[10px] py-1 rounded transition-all text-gray-400">Female</button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[10px] text-amber-200/50 block mb-1">Birth Year</label>
+                                <input 
+                                    type="number" 
+                                    id="member-birth"
+                                    placeholder="e.g. 1950" 
+                                    class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none focus:border-[#d4af37] text-amber-100"
+                                />
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-amber-200/50 block mb-1">Death Year (Optional)</label>
+                                <input 
+                                    type="number" 
+                                    id="member-death"
+                                    placeholder="Leave blank if alive" 
+                                    class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none focus:border-[#d4af37] text-amber-100"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-[10px] text-amber-200/50 block mb-1">Bio / Historic Info</label>
+                            <textarea 
+                                id="member-bio"
+                                rows="2"
+                                placeholder="Short notes, profession, or origins..." 
+                                class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none focus:border-[#d4af37] text-amber-100 custom-scrollbar resize-none"
+                            ></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-1 bg-[#120f0a] p-1 rounded border border-[#44392a]">
+                            <button type="button" onclick="setLinkType('none')" id="btn-link-none" class="text-[10px] py-1 rounded transition-all bg-[#d4af37] text-[#120f0a] font-bold">Standalone</button>
+                            <button type="button" onclick="setLinkType('spouse')" id="btn-link-spouse" class="text-[10px] py-1 rounded transition-all text-gray-400">Is Spouse</button>
+                            <button type="button" onclick="setLinkType('child')" id="btn-link-child" class="text-[10px] py-1 rounded transition-all text-gray-400">Is Child</button>
+                        </div>
+
+                        <div id="target-selector-container" class="hidden">
+                            <select 
+                                id="target-member-id"
+                                class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none text-amber-200/80"
+                            >
+                                </select>
+                        </div>
+
+                        <button type="submit" class="w-full bg-[#d4af37] text-[#120f0a] text-xs font-bold py-2 rounded flex items-center justify-center gap-1 hover:bg-[#e6c24a] transition-all cursor-pointer">
+                            + Insert Node
+                        </button>
+                    </form>
+
+                    <div class="space-y-1">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-amber-500/50 mb-2">Indexed Directory (<span id="directory-count">0</span>)</h3>
+                        <div id="directory-list" class="space-y-1.5">
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-2 pt-3 border-t border-[#2a241a] shrink-0 bg-[#1a1610]">
+                <div class="bg-[#16120d] p-2 rounded-lg border border-[#2d251c] space-y-1.5">
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-amber-500/40 text-center">Data Portability</p>
+                    <div class="grid grid-cols-2 gap-1.5 text-[11px]">
+                        <button onclick="exportJSONData()" class="bg-[#221d15] p-1.5 rounded text-center border border-[#3c3325] text-amber-200 hover:text-white hover:bg-[#2d261d] transition-all cursor-pointer">Export Data</button>
+                        <button onclick="triggerJSONImport()" class="bg-[#221d15] p-1.5 rounded text-center border border-[#3c3325] text-amber-200 hover:text-white hover:bg-[#2d261d] transition-all cursor-pointer">Import Data</button>
+                    </div>
+                    <input type="file" id="import-file-element" accept=".json" class="hidden" onchange="handleJSONImport(event)" />
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <button onclick="exportPNG()" class="bg-[#221d15] p-2 rounded text-center border border-[#332b20] hover:bg-[#2e271d] hover:text-[#d4af37] transition-all cursor-pointer font-medium">Export PNG</button>
+                    <button onclick="exportPDF()" class="bg-[#221d15] p-2 rounded text-center border border-[#332b20] hover:bg-[#2e271d] hover:text-[#d4af37] transition-all cursor-pointer font-medium">Export PDF</button>
+                </div>
+                <button onclick="clearAllData()" class="w-full bg-red-950/40 text-red-400 hover:bg-red-900/60 border border-red-900/40 text-xs p-2 rounded text-center transition-all cursor-pointer font-medium">
+                    Clear Workspace Data
+                </button>
+            </div>
+        </div>
+
+        <div id="canvas-container" class="flex-1 relative bg-[radial-gradient(#262017_1.5px,transparent_1.5px)] [background-size:32px_32px] flex flex-col justify-between items-center p-4 md:p-8 overflow-auto custom-scrollbar">
+            
+            <div id="canvas-content" class="w-max px-6 md:px-16 mx-auto flex flex-col items-center justify-start min-h-[75vh] space-y-12 py-4">
+                </div>
+
+            <div class="no-print w-full flex justify-between items-center text-[11px] text-amber-100/40 border-t border-[#221d15] pt-4 mt-8 shrink-0">
+                <p>Vamsham Node Sandbox Engine (Mobile Optimization Engine Active)</p>
+                <p class="hidden md:block">Press Ctrl+P / Cmd+P alternative target shortcut</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="edit-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+        <div class="bg-[#1a1610] border border-[#d4af37]/40 w-full max-w-md rounded-xl p-6 shadow-2xl space-y-4">
+            <div class="border-b border-[#2a241a] pb-2">
+                <h3 class="text-base font-serif tracking-wide text-[#d4af37] font-bold">Edit Person Details</h3>
+                <p class="text-[10px] text-gray-500">Modify properties or delete this entry from the tree.</p>
+            </div>
+
+            <form id="edit-form" class="space-y-3">
+                <input type="hidden" id="edit-member-id" />
+                
+                <div>
+                    <label class="text-[10px] text-amber-200/50 block mb-1">Full Name</label>
+                    <input type="text" id="edit-name" class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none focus:border-[#d4af37] text-amber-100" required />
+                </div>
+
+                <div>
+                    <label class="text-[10px] text-amber-200/50 block mb-1">Gender</label>
+                    <div class="grid grid-cols-2 gap-1 bg-[#120f0a] p-1 rounded border border-[#44392a]">
+                        <button type="button" onclick="setEditGender('M')" id="btn-edit-gender-m" class="text-[10px] py-1 rounded transition-all">Male</button>
+                        <button type="button" onclick="setEditGender('F')" id="btn-edit-gender-f" class="text-[10px] py-1 rounded transition-all">Female</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[10px] text-amber-200/50 block mb-1">Birth Year</label>
+                        <input type="number" id="edit-birth" class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none focus:border-[#d4af37] text-amber-100" />
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-amber-200/50 block mb-1">Death Year</label>
+                        <input type="number" id="edit-death" placeholder="Blank if alive" class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none focus:border-[#d4af37] text-amber-100" />
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[10px] text-amber-200/50 block mb-1">Bio / Historic Info</label>
+                    <textarea id="edit-bio" rows="3" class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none focus:border-[#d4af37] text-amber-100 custom-scrollbar resize-none"></textarea>
+                </div>
+
+                <div class="flex gap-2 pt-2 justify-between items-center text-xs border-t border-[#2a241a]">
+                    <button type="button" onclick="deleteMemberTrigger()" class="bg-red-950/40 text-red-400 hover:bg-red-900/60 border border-red-900/40 px-3 py-2 rounded transition-all cursor-pointer font-medium">
+                        Delete Person
+                    </button>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="closeEditModal()" class="bg-[#221d15] px-4 py-2 rounded border border-[#332b20] hover:bg-[#2e271d] transition-all cursor-pointer">Cancel</button>
+                        <button type="submit" class="bg-[#d4af37] text-[#120f0a] font-bold px-5 py-2 rounded hover:bg-[#e6c24a] transition-all cursor-pointer">Save Changes</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let state = {
+            members: [
+                { id: 'm1', name: 'Lakshmanan D S', gender: 'M', birth: '1938', death: '2018', bio: 'Station Master', role: 'Root Parent' },
+                { id: 'm2', name: 'Pattammal L', gender: 'F', birth: '1944', death: '', bio: 'Home maker', role: 'Root Parent' },
+                { id: 'm3', name: 'Nagarajan D L', gender: 'M', birth: '', death: '', bio: '', role: 'Child Node' },
+                { id: 'm4', name: 'Seenuvasan D L', gender: 'M', birth: '', death: '', bio: 'HVF', role: 'Child Node' },
+                { id: 'm5', name: 'Rajalakshmi A', gender: 'F', birth: '', death: '', bio: 'Home maker', role: 'Child Node' },
+                { id: 'm6', name: 'Vasudevan D L', gender: 'M', birth: '', death: '', bio: 'HVF', role: 'Child Node' },
+                { id: 'm7', name: 'Jayalakshmi B', gender: 'F', birth: '', death: '', bio: 'Teacher', role: 'Child Node' },
+                { id: 'm8', name: 'Rajasekaran D L', gender: 'M', birth: '1959', death: '', bio: 'Self Entrepreneur', role: 'Child Node' },
+                { id: 'm9', name: 'Lakshmi R', gender: 'F', birth: '1964', death: '', bio: 'Teacher', role: 'Spouse Entry' },
+                { id: 'm10', name: 'Geetha', gender: 'F', birth: '', death: '', bio: '', role: 'Spouse Entry' },
+                { id: 'm11', name: 'Kunthalambal', gender: 'F', birth: '', death: '', bio: 'Home maker', role: 'Spouse Entry' },
+                { id: 'm12', name: 'Karthik D R', gender: 'M', birth: '1988', death: '', bio: 'Technical Project Manager', role: 'Child Node' }
+            ],
+            unions: [
+                { id: 'u1', partnerA: 'm1', partnerB: 'm2', children: ['m3', 'm4', 'm5', 'm6', 'm7', 'm8'] },
+                { id: 'u2', partnerA: 'm8', partnerB: 'm9', children: ['m12'] },
+                { id: 'u3', partnerA: 'm4', partnerB: 'm10', children: [] },
+                { id: 'u4', partnerA: 'm3', partnerB: 'm11', children: [] }
+            ]
+        };
+
+        const LOCAL_STORAGE_KEY = 'vamsham_family_tree_state';
+        let currentLinkType = 'none';
+        let currentGender = 'M';
+        let modalEditingGender = 'M';
+
+        // MOBILE SIDEBAR DRAWER TOGGLE ENGINE
+        function toggleMobileSidebar() {
+            if (window.innerWidth >= 768) return; // Ignore if on desktop grid frames
+            const sidebar = document.querySelector('.no-print.w-80');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function loadFromLocalStorage() {
+            const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+            if (storedData) {
+                try {
+                    const parsed = JSON.parse(storedData);
+                    if (parsed.members && parsed.unions) {
+                        state = parsed;
+                    }
+                } catch (e) {
+                    console.error("Local storage initialization error.", e);
+                }
+            }
+        }
+
+        function exportJSONData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "vamsham-family-data.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function triggerJSONImport() {
+            document.getElementById('import-file-element').click();
+        }
+
+        function handleJSONImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedState = JSON.parse(e.target.result);
+                    if (importedState.members && importedState.unions) {
+                        state = importedState;
+                        saveToLocalStorage();
+                        renderWorkspace();
+                        populateDropdown();
+                        alert("Family dataset successfully parsed and mapped.");
+                        if (window.innerWidth < 768) toggleMobileSidebar();
+                    } else {
+                        alert("Malformed data context layout.");
+                    }
+                } catch (err) {
+                    alert("Unable to decode the chosen backup file.");
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function setGender(g) {
+            currentGender = g;
+            const btnM = document.getElementById('btn-gender-m');
+            const btnF = document.getElementById('btn-gender-f');
+            if (g === 'M') {
+                btnM.className = "text-[10px] py-1 rounded transition-all bg-[#d4af37] text-[#120f0a] font-bold";
+                btnF.className = "text-[10px] py-1 rounded transition-all text-gray-400";
+            } else {
+                btnF.className = "text-[10px] py-1 rounded transition-all bg-[#d4af37] text-[#120f0a] font-bold";
+                btnM.className = "text-[10px] py-1 rounded transition-all text-gray-400";
+            }
+        }
+
+        function setEditGender(g) {
+            modalEditingGender = g;
+            const btnM = document.getElementById('btn-edit-gender-m');
+            const btnF = document.getElementById('btn-edit-gender-f');
+            if (g === 'M') {
+                btnM.className = "text-[10px] py-1 rounded transition-all bg-[#d4af37] text-[#120f0a] font-bold";
+                btnF.className = "text-[10px] py-1 rounded transition-all bg-[#120f0a] text-gray-400";
+            } else {
+                btnF.className = "text-[10px] py-1 rounded transition-all bg-[#d4af37] text-[#120f0a] font-bold";
+                btnM.className = "text-[10px] py-1 rounded transition-all bg-[#120f0a] text-gray-400";
+            }
+        }
+
+        function setLinkType(type) {
+            currentLinkType = type;
+            ['none', 'spouse', 'child'].forEach(t => {
+                const btn = document.getElementById(`btn-link-${t}`);
+                btn.className = (t === type) ? "text-[10px] py-1 rounded transition-all bg-[#d4af37] text-[#120f0a] font-bold" : "text-[10px] py-1 rounded transition-all text-gray-400";
+            });
+
+            const container = document.getElementById('target-selector-container');
+            if (type === 'none') {
+                container.classList.add('hidden');
+            } else {
+                container.classList.remove('hidden');
+                populateDropdown();
+            }
+        }
+
+        function populateDropdown() {
+            const select = document.getElementById('target-member-id');
+            select.innerHTML = '<option value="">Select Relational Match...</option>';
+            state.members.forEach(m => {
+                select.innerHTML += `<option value="${m.id}">${m.name}</option>`;
+            });
+        }
+
+        function formatLifespan(birth, death) {
+            if (!birth) return '';
+            return death ? `(${birth} — ${death})` : `(b. ${birth})`;
+        }
+
+        function getGenderClasses(gender) {
+            if (gender === 'F') {
+                return { text: 'text-pink-200', subtext: 'text-pink-400/60', border: 'border-pink-500/30' };
+            }
+            return { text: 'text-blue-200', subtext: 'text-blue-400/60', border: 'border-blue-500/30' };
+        }
+
+        function openEditModal(id) {
+            if(!id) return;
+            const member = state.members.find(m => m.id === id);
+            if (!member) return;
+
+            document.getElementById('edit-member-id').value = member.id;
+            document.getElementById('edit-name').value = member.name;
+            document.getElementById('edit-birth').value = member.birth || '';
+            document.getElementById('edit-death').value = member.death || '';
+            document.getElementById('edit-bio').value = member.bio || '';
+            
+            setEditGender(member.gender || 'M');
+            document.getElementById('edit-modal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.add('hidden');
+        }
+
+        function deleteMemberTrigger() {
+            const id = document.getElementById('edit-member-id').value;
+            const member = state.members.find(m => m.id === id);
+            if (!member) return;
+
+            if (confirm(`Are you sure you want to remove ${member.name}?`)) {
+                state.members = state.members.filter(m => m.id !== id);
+                state.unions = state.unions.map(u => {
+                    if (u.partnerA === id) u.partnerA = null;
+                    if (u.partnerB === id) u.partnerB = null;
+                    if (u.children) u.children = u.children.filter(childId => childId !== id);
+                    return u;
+                }).filter(u => u.partnerA || u.partnerB || (u.children && u.children.length > 0));
+
+                saveToLocalStorage();
+                closeEditModal();
+                renderWorkspace();
+                populateDropdown();
+            }
+        }
+
+        document.getElementById('edit-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-member-id').value;
+            const member = state.members.find(m => m.id === id);
+            
+            if (member) {
+                member.name = document.getElementById('edit-name').value.trim();
+                member.gender = modalEditingGender;
+                member.birth = document.getElementById('edit-birth').value.trim();
+                member.death = document.getElementById('edit-death').value.trim();
+                member.bio = document.getElementById('edit-bio').value.trim();
+                
+                saveToLocalStorage();
+                renderWorkspace();
+                closeEditModal();
+            }
+        });
+
+        // RECURSIVE TREE GENERATOR LAYOUT LOGIC
+        function buildTreeHTML(node, isChild = false) {
+            if (node.name) {
+                const colors = getGenderClasses(node.gender);
+                return `
+                    <div class="relative flex flex-col items-center shrink-0">
+                        ${isChild ? `<div class="w-[2px] h-4 bg-[#d4af37]/30 mb-2"></div>` : ''}
+                        <div onclick="openEditModal('${node.id}')" class="cursor-pointer px-4 py-3 bg-[#221d15] border ${colors.border} rounded-lg text-center shadow-md w-[170px] md:w-[200px] hover:border-amber-400 transition-all">
+                            <p class="text-xs font-bold ${colors.text} truncate">${node.name}</p>
+                            <p class="text-[10px] text-amber-400/60 font-mono mt-0.5">${formatLifespan(node.birth, node.death)}</p>
+                            ${node.bio ? `<p class="text-[10px] text-gray-400 mt-2 border-t border-[#3a3124] pt-1 text-left leading-relaxed italic h-auto w-full break-words whitespace-normal">${node.bio}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            const partnerA = state.members.find(m => m.id === node.partnerA);
+            const partnerB = state.members.find(m => m.id === node.partnerB);
+            const pAColors = partnerA ? getGenderClasses(partnerA.gender) : { text: 'text-gray-500', subtext: 'text-gray-600' };
+            const pBColors = partnerB ? getGenderClasses(partnerB.gender) : { text: 'text-gray-500', subtext: 'text-gray-600' };
+
+            let childrenHTML = '';
+            if (node.children && node.children.length > 0) {
+                let childrenElementsHTML = '';
+                node.children.forEach(childId => {
+                    const childUnion = state.unions.find(u => u.partnerA === childId || u.partnerB === childId);
+                    if (childUnion) {
+                        childrenElementsHTML += buildTreeHTML(childUnion, true);
+                    } else {
+                        const childMember = state.members.find(m => m.id === childId);
+                        if (childMember) childrenElementsHTML += buildTreeHTML(childMember, true);
+                    }
+                });
+
+                childrenHTML = `
+                    <div class="w-full flex flex-col items-center mt-4">
+                        <div class="w-[2px] h-4 bg-[#d4af37]/30"></div>
+                        <div class="flex gap-4 md:gap-6 justify-center items-start border-t border-[#d4af37]/30 relative pt-4 px-2 md:px-4">
+                            ${childrenElementsHTML}
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="flex flex-col items-center relative shrink-0">
+                    ${isChild ? `<div class="w-[2px] h-4 bg-[#d4af37]/30 mb-2"></div>` : ''}
+                    <div class="flex items-stretch gap-2 md:gap-4 bg-[#1a1610]/90 p-3 md:p-4 rounded-xl border border-[#d4af37]/40 shadow-[0_0_20px_rgba(212,175,55,0.05)]">
+                        <div onclick="openEditModal('${partnerA ? partnerA.id : ''}')" class="cursor-pointer text-center w-[135px] md:w-[165px] flex flex-col justify-between p-1 rounded hover:bg-[#221d15]/50 transition-colors">
+                            <div>
+                                <p class="text-xs font-bold ${pAColors.text} tracking-wide truncate">${partnerA ? partnerA.name : 'Unknown/Removed'}</p>
+                                <p class="text-[10px] ${pAColors.subtext} font-mono mt-0.5">${partnerA ? formatLifespan(partnerA.birth, partnerA.death) : ''}</p>
+                            </div>
+                            ${partnerA && partnerA.bio ? `<p class="text-[10px] text-gray-400 mt-2 border-t border-[#322a1e] pt-1 text-left italic leading-normal h-auto w-full break-words whitespace-normal">${partnerA.bio}</p>` : ''}
+                        </div>
+                        
+                        ${partnerB || partnerA ? `
+                            <div class="text-amber-500 font-serif text-lg md:text-xl flex items-center px-0.5">×</div>
+                            <div onclick="openEditModal('${partnerB ? partnerB.id : ''}')" class="cursor-pointer text-center w-[135px] md:w-[165px] flex flex-col justify-between p-1 rounded hover:bg-[#221d15]/50 transition-colors">
+                                <div>
+                                    <p class="text-xs font-bold ${pBColors.text} tracking-wide truncate">${partnerB ? partnerB.name : 'Unknown/Removed'}</p>
+                                    <p class="text-[10px] ${pBColors.subtext} font-mono mt-0.5">${partnerB ? formatLifespan(partnerB.birth, partnerB.death) : ''}</p>
+                                </div>
+                                ${partnerB && partnerB.bio ? `<p class="text-[10px] text-gray-400 mt-2 border-t border-[#322a1e] pt-1 text-left italic leading-normal h-auto w-full break-words whitespace-normal">${partnerB.bio}</p>` : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                    ${childrenHTML}
+                </div>
+            `;
+        }
+
+        function renderWorkspace() {
+            document.getElementById('directory-count').innerText = state.members.length;
+
+            const directoryList = document.getElementById('directory-list');
+            directoryList.innerHTML = '';
+            state.members.forEach(m => {
+                const ageStr = formatLifespan(m.birth, m.death);
+                const genderLabel = m.gender === 'F' ? '🌸 F' : '🔷 M';
+                directoryList.innerHTML += `
+                    <div class="p-2 text-xs bg-[#1f1a13] rounded border border-[#2d251b] flex items-center justify-between hover:border-[#d4af37]/40 transition-all">
+                        <div class="truncate max-w-[190px]">
+                            <span class="truncate font-medium text-gray-300 block">${m.name}</span>
+                            <p class="text-[10px] text-amber-400/40 font-mono">${genderLabel} ${ageStr}</p>
+                        </div>
+                        <button onclick="openEditModal('${m.id}')" class="text-gray-500 hover:text-[#d4af37] p-1 cursor-pointer transition-colors" title="Edit Properties">✏️</button>
+                    </div>
+                `;
+            });
+
+            const canvas = document.getElementById('canvas-content');
+            canvas.innerHTML = `
+                <div class="text-center no-print hidden md:block">
+                    <p class="text-xs text-amber-400/40 tracking-widest uppercase mb-1">Canvas Sandbox View</p>
+                    <div class="h-[1px] w-12 bg-[#d4af37]/30 mx-auto"></div>
+                </div>
+                <div class="w-full flex flex-col items-center gap-12 md:gap-16" id="tree-nodes-wrapper"></div>
+            `;
+
+            const wrapper = document.getElementById('tree-nodes-wrapper');
+
+            const childIds = new Set(state.unions.flatMap(u => u.children || []));
+            const rootUnions = state.unions.filter(u => !childIds.has(u.partnerA) && !childIds.has(u.partnerB));
+            const rootIsolated = state.members.filter(m => {
+                const inUnion = state.unions.some(u => u.partnerA === m.id || u.partnerB === m.id);
+                return !inUnion && !childIds.has(m.id);
+            });
+
+            rootUnions.forEach(u => { wrapper.innerHTML += buildTreeHTML(u, false); });
+            rootIsolated.forEach(im => { wrapper.innerHTML += buildTreeHTML(im, false); });
+        }
+
+        // Form Submit Management
+        document.getElementById('member-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nameField = document.getElementById('member-name');
+            const birthField = document.getElementById('member-birth');
+            const deathField = document.getElementById('member-death');
+            const bioField = document.getElementById('member-bio');
+            const targetSelect = document.getElementById('target-member-id');
+            
+            const name = nameField.value.trim();
+            if (!name) return;
+
+            const newId = `m_${Date.now()}`;
+            let assignedRole = 'Root Tree';
+
+            if (currentLinkType === 'child' && targetSelect.value) assignedRole = 'Child Node';
+            if (currentLinkType === 'spouse' && targetSelect.value) assignedRole = 'Spouse Entry';
+
+            state.members.push({ 
+                id: newId, name: name, gender: currentGender,
+                birth: birthField.value.trim(), death: deathField.value.trim(), 
+                bio: bioField.value.trim(), role: assignedRole 
+            });
+
+            if (currentLinkType === 'spouse' && targetSelect.value) {
+                state.unions.push({ id: `u_${Date.now()}`, partnerA: targetSelect.value, partnerB: newId, children: [] });
+            } else if (currentLinkType === 'child' && targetSelect.value) {
+                const targetId = targetSelect.value;
+                const existingUnion = state.unions.find(u => u.partnerA === targetId || u.partnerB === targetId);
+                if (existingUnion) {
+                    existingUnion.children.push(newId);
+                } else {
+                    state.unions.push({ id: `u_${Date.now()}`, partnerA: targetId, partnerB: null, children: [newId] });
+                }
+            }
+
+            nameField.value = ''; birthField.value = ''; deathField.value = ''; bioField.value = '';
+            setGender('M'); setLinkType('none');
+            
+            saveToLocalStorage();
+            renderWorkspace();
+            if (window.innerWidth < 768) toggleMobileSidebar(); // Hide drawer on node insert completion
+        });
+
+        function clearAllData() {
+            if (confirm("Are you sure you want to clear your entire family tree construction space?")) {
+                state.members = []; state.unions = [];
+                saveToLocalStorage();
+                renderWorkspace(); populateDropdown();
+                if (window.innerWidth < 768) toggleMobileSidebar();
+            }
+        }
+
+        function getFullCanvasBounds() {
+            const target = document.getElementById('canvas-content');
+            return {
+                width: target.scrollWidth + 100,
+                height: target.scrollHeight + 100
+            };
+        }
+
+        function exportPNG() {
+            const target = document.getElementById('canvas-content');
+            const btn = document.querySelector('button[onclick="exportPNG()"]');
+            btn.innerText = "Capturing...";
+            
+            const bounds = getFullCanvasBounds();
+
+            html2canvas(target, { 
+                backgroundColor: '#120f0a', 
+                scale: 2, 
+                logging: false,
+                width: bounds.width,
+                height: bounds.height,
+                windowWidth: bounds.width,
+                windowHeight: bounds.height,
+                x: 0,
+                y: 0
+            }).then(canvas => {
+                const downloadLink = document.createElement('a');
+                downloadLink.download = 'vamsham-family-tree.png';
+                downloadLink.href = canvas.toDataURL('image/png');
+                downloadLink.click();
+                btn.innerText = "Export PNG";
+            }).catch(err => {
+                alert("PNG capture configuration internal error.");
+                btn.innerText = "Export PNG";
+            });
+        }
+
+        function exportPDF() {
+            const target = document.getElementById('canvas-content');
+            const btn = document.querySelector('button[onclick="exportPDF()"]');
+            const originalText = btn.innerText;
+            btn.innerText = "Preparing PDF...";
+
+            const bounds = getFullCanvasBounds();
+
+            html2canvas(target, { 
+                backgroundColor: '#120f0a', 
+                scale: 2.5, 
+                logging: false,
+                width: bounds.width,
+                height: bounds.height,
+                windowWidth: bounds.width,
+                windowHeight: bounds.height,
+                x: 0,
+                y: 0
+            }).then(canvas => {
+                const printWrapper = document.getElementById('print-wrapper');
+                printWrapper.innerHTML = ''; 
+                
+                const img = document.createElement('img');
+                img.src = canvas.toDataURL('image/png');
+                printWrapper.appendChild(img);
+
+                setTimeout(() => {
+                    window.print();
+                    btn.innerText = originalText;
+                    printWrapper.innerHTML = ''; 
+                }, 400);
+
+            }).catch(err => {
+                alert("PDF system printing compilation driver failed.");
+                btn.innerText = originalText;
+            });
+        }
+
+        // Initialize App Workflow Sequence
+        loadFromLocalStorage();
+        renderWorkspace();
+    </script>
+</body>
+</html>
