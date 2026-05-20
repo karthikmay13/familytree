@@ -87,7 +87,7 @@
                         <p class="text-[10px] text-amber-200/40 uppercase tracking-widest">Family Tree Workspace</p>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span class="bg-[#2a2318] text-[#d4af37] border border-[#d4af37]/30 text-xs px-2 py-0.5 rounded-full font-mono">v2.5</span>
+                        <span class="bg-[#2a2318] text-[#d4af37] border border-[#d4af37]/30 text-xs px-2 py-0.5 rounded-full font-mono">v2.6</span>
                         <button onclick="toggleMobileSidebar()" class="md:hidden text-gray-400 text-sm p-1">✕ Close</button>
                     </div>
                 </div>
@@ -193,7 +193,7 @@
             <div id="canvas-content" class="w-max px-6 md:px-16 mx-auto flex flex-col items-center justify-start min-h-[75vh] space-y-12 py-4"></div>
 
             <div class="no-print w-full flex justify-between items-center text-[11px] text-amber-100/40 border-t border-[#221d15] pt-4 mt-8 shrink-0">
-                <p>Vamsham Node Sandbox Engine (Production Dataset 2.5 Live)</p>
+                <p>Vamsham Node Sandbox Engine (Production Dataset 2.6 Live)</p>
                 <p class="hidden md:block">Press Ctrl+P / Cmd+P alternative target shortcut</p>
             </div>
         </div>
@@ -240,9 +240,7 @@
                 </div>
 
                 <div class="flex gap-2 pt-2 justify-between items-center text-xs border-t border-[#2a241a]">
-                    <button type="button" onclick="deleteMemberTrigger()" class="bg-red-950/40 text-red-400 hover:bg-red-900/60 border border-red-900/40 px-3 py-2 rounded transition-all cursor-pointer font-medium">
-                        Delete Person
-                    </button>
+                    <button type="button" onclick="deleteMemberTrigger()" class="bg-red-950/40 text-red-400 hover:bg-red-900/60 border border-red-900/40 px-3 py-2 rounded transition-all cursor-pointer font-medium"> Delete Person </button>
                     <div class="flex gap-2">
                         <button type="button" onclick="closeEditModal()" class="bg-[#221d15] px-4 py-2 rounded border border-[#332b20] hover:bg-[#2e271d] transition-all cursor-pointer">Cancel</button>
                         <button type="submit" class="bg-[#d4af37] text-[#120f0a] font-bold px-5 py-2 rounded hover:bg-[#e6c24a] transition-all cursor-pointer">Save Changes</button>
@@ -253,7 +251,6 @@
     </div>
 
     <script>
-        // FIXED: Embedded your complete, verified 20-May-2026 44-member family dataset
         const BASELINE_PRODUCTION_DATA = {
             "members": [
                 { "id": "m1", "name": "Lakshmanan D S", "gender": "M", "birth": "1938", "death": "2018", "bio": "Station Master", "role": "Root Parent" },
@@ -278,7 +275,7 @@
                 { "id": "m_1779077311661", "name": "Abhinav M", "gender": "M", "birth": "2002", "death": "", "bio": "", "role": "Child Node" },
                 { "id": "m_1779077333458", "name": "Ananya M", "gender": "F", "birth": "2008", "death": "", "bio": "", "role": "Child Node" },
                 { "id": "m_1779077366090", "name": "Srinivasan K A", "gender": "M", "birth": "1974", "death": "", "bio": "", "role": "Child Node" },
-                { "id": "m_1779077400371", "name": "Radhika S", "gender": "F", "birth": "1977", "death": "", "bio": "", "role": "Spouse Entry" },
+                { "id": "m_1779077400371", "name": "Radhika R", "gender": "F", "birth": "1979", "death": "", "bio": "", "role": "Spouse Entry" },
                 { "id": "m_1779077454067", "name": "Avanish S", "gender": "M", "birth": "2009", "death": "", "bio": "", "role": "Child Node" },
                 { "id": "m_1779077493621", "name": "Shreya S", "gender": "F", "birth": "2003", "death": "", "bio": "", "role": "Child Node" },
                 { "id": "m_1779288131862", "name": "Lakshmi D", "gender": "F", "birth": "1990", "death": "", "bio": "Home maker", "role": "Spouse Entry" },
@@ -300,7 +297,8 @@
                 { "id": "m_1779288501146", "name": "Nandakumar", "gender": "M", "birth": "", "death": "", "bio": "", "role": "Spouse Entry" },
                 { "id": "m_1779288571014", "name": "Vivek D R", "gender": "M", "birth": "1992", "death": "", "bio": "Self Enterpreneur", "role": "Child Node" },
                 { "id": "m_1779288585463", "name": "Kirthiga K", "gender": "F", "birth": "", "death": "", "bio": "Home maker", "role": "Spouse Entry" },
-                { "id": "m_1779288604515", "name": "Vivega V", "gender": "F", "birth": "2023", "death": "", "bio": "", "role": "Child Node" }
+                { "id": "m_1779288604515", "name": "Vivega V", "gender": "F", "birth": "2023", "death": "", "bio": "", "role": "Child Node" },
+                { "id": "m_1779288755000", "name": "Rohith", "gender": "M", "birth": "", "death": "", "bio": "Student", "role": "Child Node" }
             ],
             "unions": [
                 { "id": "u1", "partnerA": "m1", "partnerB": "m2", "children": ["m3", "m4", "m5", "m6", "m7", "m8"] },
@@ -316,14 +314,12 @@
                 { "id": "u_1779288201178", "partnerA": "m7", "partnerB": "m_1779288201178", "children": ["m_1779288220145", "m_1779288236377"] },
                 { "id": "u_1779288258245", "partnerA": "m_1779288220145", "partnerB": "m_1779288258245", "children": ["m_1779288292577"] },
                 { "id": "u_1779288270862", "partnerA": "m_1779288236377", "partnerB": "m_1779288270862", "children": ["m_1779288305911"] },
-                { "id": "u_1779288386679", "partnerA": "m_1779288367329", "partnerB": "m_1779288386679", "children": [] },
-                { "id": "u_1779288501146", "partnerA": "m_1779288355140", "partnerB": "m_1779288501146", "children": [] },
+                { "id": "u_1779288386679", "partnerA": "m_1779288367329", "partnerB": "m_1779288386679", "children": ["m_1779288755000"] },
                 { "id": "u_1779288501146", "partnerA": "m_1779288355140", "partnerB": "m_1779288501146", "children": [] },
                 { "id": "u_1779288585463", "partnerA": "m_1779288571014", "partnerB": "m_1779288585463", "children": ["m_1779288604515"] }
             ]
         };
 
-        // Active state variables initialized as duplicates of the golden baseline
         let state = JSON.parse(JSON.stringify(BASELINE_PRODUCTION_DATA));
 
         const LOCAL_STORAGE_KEY = 'vamsham_family_tree_state';
@@ -349,13 +345,11 @@
             localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
         }
 
-        // FIXED: Cache verification safeguard logic rule implementation
         function loadFromLocalStorage() {
             const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
             if (storedData) {
                 try {
                     const parsed = JSON.parse(storedData);
-                    // Only use local storage if it contains our large updated family dataset
                     if (parsed.members && parsed.members.length > 15) {
                         state = parsed;
                         return;
@@ -364,7 +358,6 @@
                     console.error("Local storage allocation schema failed to initialize.", e);
                 }
             }
-            // Defaults automatically to our clean baseline source data structure arrays
             state = JSON.parse(JSON.stringify(BASELINE_PRODUCTION_DATA));
         }
 
@@ -703,7 +696,6 @@
             };
         }
 
-        // FIXED: Boundary clamping overhaul configuration logic rules execution
         function exportPNG() {
             const mainLayout = document.getElementById('main-layout');
             const canvasContainer = document.getElementById('canvas-container');
@@ -711,7 +703,6 @@
             const btn = document.querySelector('button[onclick="exportPNG()"]');
             btn.innerText = "Capturing...";
             
-            // Step 1: Temporarily unclamp structural container layout flow properties
             const prevLayoutOverflow = mainLayout.style.overflow;
             const prevContainerOverflow = canvasContainer.style.overflow;
             const prevContainerWidth = canvasContainer.style.width;
@@ -724,7 +715,6 @@
 
             const bounds = getFullCanvasBounds();
 
-            // Step 2: Feed full bounding canvas calculations into target capture thread
             html2canvas(target, { 
                 backgroundColor: '#120f0a', 
                 scale: 2, 
@@ -741,7 +731,6 @@
                 downloadLink.href = canvas.toDataURL('image/png');
                 downloadLink.click();
                 
-                // Step 3: Seamlessly re-clamp responsive layout restrictions
                 mainLayout.style.overflow = prevLayoutOverflow;
                 canvasContainer.style.overflow = prevContainerOverflow;
                 canvasContainer.style.width = prevContainerWidth;
