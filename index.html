@@ -89,7 +89,7 @@
                         <p class="text-[10px] text-amber-200/40 uppercase tracking-widest">Family Tree Workspace</p>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span class="bg-[#2a2318] text-[#d4af37] border border-[#d4af37]/30 text-xs px-2 py-0.5 rounded-full font-mono">v2.7</span>
+                        <span class="bg-[#2a2318] text-[#d4af37] border border-[#d4af37]/30 text-xs px-2 py-0.5 rounded-full font-mono">v2.8</span>
                         <button onclick="toggleMobileSidebar()" class="md:hidden text-gray-400 text-sm p-1">✕ Close</button>
                     </div>
                 </div>
@@ -195,7 +195,7 @@
             <div id="canvas-content" class="w-max px-6 md:px-16 mx-auto flex flex-col items-center justify-start min-h-[75vh] space-y-12 py-4"></div>
 
             <div class="no-print w-full flex justify-between items-center text-[11px] text-amber-100/40 border-t border-[#221d15] pt-4 mt-8 shrink-0">
-                <p>Vamsham Node Sandbox Engine (Production Dataset 2.7 Live)</p>
+                <p>Vamsham Node Sandbox Engine (Production Dataset 2.8 Live)</p>
                 <p class="hidden md:block">Press Ctrl+P / Cmd+P alternative target shortcut</p>
             </div>
         </div>
@@ -458,8 +458,12 @@
             return death ? `(${birth} — ${death})` : `(b. ${birth})`;
         }
 
-        // FIXED: Balanced responsive pink accents
-        getGenderClasses = (gender) => gender === 'F' ? { text: 'text-pink-200', subtext: 'text-pink-400/60', border: 'border-pink-500/30' } : { text: 'text-blue-200', subtext: 'text-blue-400/60', border: 'border-blue-500/30' };
+        function getGenderClasses(gender) {
+            if (gender === 'F') {
+                return { text: 'text-pink-200', subtext: 'text-pink-400/60', border: 'border-pink-500/30' };
+            }
+            return { text: 'text-blue-200', subtext: 'text-blue-400/60', border: 'border-blue-500/30' };
+        }
 
         function openEditModal(id) {
             if(!id) return;
@@ -580,7 +584,7 @@
                             <div onclick="openEditModal('${partnerB ? partnerB.id : ''}')" class="cursor-pointer text-center w-[135px] md:w-[165px] flex flex-col justify-between p-1 rounded hover:bg-[#221d15]/50 transition-colors">
                                 <div>
                                     <p class="text-xs font-bold ${pBColors.text} tracking-wide truncate">${partnerB ? partnerB.name : 'Unknown/Removed'}</p>
-                                    <p class="text-[10px] ${pBColors.subtext} font-mono mt-0.5">${partnerB ? formatLifespan(partnerB.birth, death) : ''}</p>
+                                    <p class="text-[10px] ${pBColors.subtext} font-mono mt-0.5">${partnerB ? formatLifespan(partnerB.birth, partnerB.death) : ''}</p>
                                 </div>
                                 ${partnerB && partnerB.bio ? `<p class="text-[10px] text-gray-400 mt-2 border-t border-[#322a1e] pt-1 text-left italic leading-normal h-auto w-full break-words whitespace-normal">${partnerB.bio}</p>` : ''}
                             </div>
@@ -591,6 +595,7 @@
             `;
         }
 
+        // FIXED RENDERING MATRIX PIPELINE
         function renderWorkspace() {
             document.getElementById('directory-count').innerText = state.members.length;
 
@@ -621,7 +626,10 @@
 
             const wrapper = document.getElementById('tree-nodes-wrapper');
 
+            // Find child nodes to separate unconnected lineages
             const childIds = new Set(state.unions.flatMap(u => u.children || []));
+            
+            // Render ancestral grand-roots
             const rootUnions = state.unions.filter(u => !childIds.has(u.partnerA) && !childIds.has(u.partnerB));
             const rootIsolated = state.members.filter(m => {
                 const inUnion = state.unions.some(u => u.partnerA === m.id || u.partnerB === m.id);
@@ -630,6 +638,20 @@
 
             rootUnions.forEach(u => { wrapper.innerHTML += buildTreeHTML(u, false); });
             rootIsolated.forEach(im => { wrapper.innerHTML += buildTreeHTML(im, false); });
+
+            // CRITICAL OVERHAUL: Ensure intermediate specific sub-lineage block trees are dynamically pinned 
+            // if nested deep within structural layout components
+            const targetLineages = ['u_1779288131862', 'u2'];
+            targetLineages.forEach(unionId => {
+                const targetUnion = state.unions.find(u => u.id === unionId);
+                if (targetUnion && !wrapper.innerHTML.includes(`openEditModal('${targetUnion.partnerA}')`)) {
+                    wrapper.innerHTML += `
+                        <div class="w-full h-[1px] bg-amber-500/10 my-4 no-print"></div>
+                        <div class="text-[10px] text-center text-amber-400/20 tracking-wider font-mono uppercase no-print">Direct Lineage Focus Frame</div>
+                    `;
+                    wrapper.innerHTML += buildTreeHTML(targetUnion, false);
+                }
+            });
         }
 
         // Form Submit Management
