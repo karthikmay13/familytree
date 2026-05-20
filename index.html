@@ -6,13 +6,10 @@
     <title>Vamsham - Family Tree Builder</title>
     <script>
       window.tailwind = {
-        config: {
-          // Custom configurations can be appended here
-        }
+        config: {}
       }
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
@@ -28,7 +25,6 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #44392a; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #d4af37; }
 
-        /* ADVANCED PRINT ENGINE PIPELINE OVERRIDES */
         @media print {
             @page { size: landscape; margin: 0mm; }
             body, html { 
@@ -41,7 +37,6 @@
             }
             .no-print, #mobile-top-bar, #sidebar-overlay { display: none !important; }
             #main-layout { display: none !important; }
-            
             #print-wrapper { 
                 display: block !important; 
                 width: 100vw !important; 
@@ -82,14 +77,13 @@
         <div class="no-print fixed md:relative inset-y-0 left-0 z-30 w-80 bg-[#1a1610] border-r border-[#2a241a] flex flex-col justify-between shadow-2xl shrink-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out h-full">
             
             <div class="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-4">
-                
                 <div class="mb-4 flex justify-between items-center shrink-0">
                     <div>
                         <h1 class="text-2xl font-serif tracking-widest text-[#d4af37] font-bold hidden md:block">VAMSHAM</h1>
                         <p class="text-[10px] text-amber-200/40 uppercase tracking-widest">Family Tree Workspace</p>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span class="bg-[#2a2318] text-[#d4af37] border border-[#d4af37]/30 text-xs px-2 py-0.5 rounded-full font-mono">v2.8</span>
+                        <span class="bg-[#2a2318] text-[#d4af37] border border-[#d4af37]/30 text-xs px-2 py-0.5 rounded-full font-mono">v2.9</span>
                         <button onclick="toggleMobileSidebar()" class="md:hidden text-gray-400 text-sm p-1">✕ Close</button>
                     </div>
                 </div>
@@ -179,7 +173,7 @@
                     </div>
 
                     <div class="grid grid-cols-2 gap-2 text-xs">
-                        <button onclick="exportPNG()" class="bg-[#221d15] p-2 rounded text-center border border-[#332b20] hover:bg-[#2e271d] hover:text-[#d4af37] transition-all cursor-pointer font-medium">Export PNG</button>
+                        <button onclick="exportPNG()" class="bg-[#d4af37] text-[#120f0a] p-2 rounded text-center border border-[#d4af37] hover:bg-[#e6c24a] transition-all cursor-pointer font-bold">Export PNG</button>
                         <button onclick="exportPDF()" class="bg-[#221d15] p-2 rounded text-center border border-[#332b20] hover:bg-[#2e271d] hover:text-[#d4af37] transition-all cursor-pointer font-medium">Export PDF</button>
                     </div>
                     
@@ -195,7 +189,7 @@
             <div id="canvas-content" class="w-max px-6 md:px-16 mx-auto flex flex-col items-center justify-start min-h-[75vh] space-y-12 py-4"></div>
 
             <div class="no-print w-full flex justify-between items-center text-[11px] text-amber-100/40 border-t border-[#221d15] pt-4 mt-8 shrink-0">
-                <p>Vamsham Node Sandbox Engine (Production Dataset 2.8 Live)</p>
+                <p>Vamsham Node Sandbox Engine (Production Dataset 2.9 Live)</p>
                 <p class="hidden md:block">Press Ctrl+P / Cmd+P alternative target shortcut</p>
             </div>
         </div>
@@ -255,8 +249,8 @@
     <script>
         const BASELINE_PRODUCTION_DATA = {
             "members": [
-                { "id": "m1", "name": "Lakshmanan D S", "gender": "M", "birth": "1938", "death": "2018", "bio": "Station Master", "role": "Root Parent" },
-                { "id": "m2", "name": "Saraswathi L", "gender": "F", "birth": "1944", "death": "", "bio": "Home maker", "role": "Root Parent" },
+                { "id": "m1", "name": "Lakshmanan D S", "gender": "M", "birth": "18", "death": "", "bio": "Station Master", "role": "Root Parent" },
+                { "id": "m2", "name": "Saraswathi L", "gender": "F", "birth": "", "death": "", "bio": "Home maker", "role": "Root Parent" },
                 { "id": "m3", "name": "Nagarajan D L", "gender": "M", "birth": "", "death": "", "bio": "", "role": "Child Node" },
                 { "id": "m4", "name": "Seenuvasan D L", "gender": "M", "birth": "", "death": "", "bio": "HVF", "role": "Child Node" },
                 { "id": "m5", "name": "Rajalakshmi A", "gender": "F", "birth": "1936", "death": "", "bio": "Home maker", "role": "Child Node" },
@@ -265,7 +259,7 @@
                 { "id": "m8", "name": "Rajasekaran D L", "gender": "M", "birth": "1959", "death": "", "bio": "Self Entrepreneur", "role": "Child Node" },
                 { "id": "m9", "name": "Lakshmi R", "gender": "F", "birth": "1964", "death": "", "bio": "Teacher", "role": "Spouse Entry" },
                 { "id": "m10", "name": "Geetha", "gender": "F", "birth": "", "death": "", "bio": "", "role": "Spouse Entry" },
-                { "id": "m11", "name": "Kunthalambal", "gender": "F", "birth": "", "death": "", "bio": "Home maker", "role": "Spouse Entry" },
+                { "id": "m11", "name": "Kunthalambal", "gender": "F", "birth": "", "death": "2026", "bio": "Home maker", "role": "Spouse Entry" },
                 { "id": "m12", "name": "Karthik D R", "gender": "M", "birth": "1988", "death": "", "bio": "Technical Project Manager", "role": "Child Node" },
                 { "id": "m_1779077068224", "name": "Arunachalam K", "gender": "M", "birth": "1931", "death": "2024", "bio": "", "role": "Spouse Entry" },
                 { "id": "m_1779077120809", "name": "Prabhakaran K A", "gender": "M", "birth": "1969", "death": "", "bio": "", "role": "Child Node" },
@@ -277,7 +271,7 @@
                 { "id": "m_1779077311661", "name": "Abhinav M", "gender": "M", "birth": "2002", "death": "", "bio": "", "role": "Child Node" },
                 { "id": "m_1779077333458", "name": "Ananya M", "gender": "F", "birth": "2008", "death": "", "bio": "", "role": "Child Node" },
                 { "id": "m_1779077366090", "name": "Srinivasan K A", "gender": "M", "birth": "1974", "death": "", "bio": "", "role": "Child Node" },
-                { "id": "m_1779077400371", "name": "Radhika R", "gender": "F", "birth": "1979", "death": "", "bio": "", "role": "Spouse Entry" },
+                { "id": "m_1779077400371", "name": "Radhika R", "gender": "F", "birth": "1979", "death": "", "bio": "Home maker", "role": "Spouse Entry" },
                 { "id": "m_1779077454067", "name": "Avanish S", "gender": "M", "birth": "2009", "death": "", "bio": "", "role": "Child Node" },
                 { "id": "m_1779077493621", "name": "Shreya S", "gender": "F", "birth": "2003", "death": "", "bio": "", "role": "Child Node" },
                 { "id": "m_1779288131862", "name": "Lakshmi D", "gender": "F", "birth": "1990", "death": "", "bio": "Home maker", "role": "Spouse Entry" },
@@ -291,7 +285,7 @@
                 { "id": "m_1779288270862", "name": "Rajesh", "gender": "M", "birth": "", "death": "", "bio": "", "role": "Spouse Entry" },
                 { "id": "m_1779288292577", "name": "Bala", "gender": "F", "birth": "", "death": "", "bio": "College Student", "role": "Child Node" },
                 { "id": "m_1779288305911", "name": "Vidyuth", "gender": "M", "birth": "", "death": "", "bio": "Student", "role": "Child Node" },
-                { "id": "m_1779288325512", "name": "Lavanya", "gender": "F", "birth": "1986", "death": "", "bio": "", "role": "Child Node" },
+                { "id": "m_1779288325512", "name": "Lavanya", "gender": "F", "birth": "1986", "death": "", "bio": "Home maker", "role": "Child Node" },
                 { "id": "m_1779288339995", "name": "Prabhushankar", "gender": "M", "birth": "", "death": "", "bio": "", "role": "Child Node" },
                 { "id": "m_1779288355140", "name": "Sundari", "gender": "F", "birth": "", "death": "", "bio": "Home maker", "role": "Child Node" },
                 { "id": "m_1779288367329", "name": "Bhuvaneshwari", "gender": "F", "birth": "", "death": "", "bio": "Home maker", "role": "Child Node" },
@@ -357,7 +351,7 @@
                         return;
                     }
                 } catch (e) {
-                    console.error("Local storage allocation schema failed to initialize.", e);
+                    console.error("Local storage initialization failed.", e);
                 }
             }
             state = JSON.parse(JSON.stringify(BASELINE_PRODUCTION_DATA));
@@ -523,7 +517,6 @@
             }
         });
 
-        // RECURSIVE TREE GENERATOR LAYOUT LOGIC
         function buildTreeHTML(node, isChild = false) {
             if (node.name) {
                 const colors = getGenderClasses(node.gender);
@@ -595,7 +588,6 @@
             `;
         }
 
-        // FIXED RENDERING MATRIX PIPELINE
         function renderWorkspace() {
             document.getElementById('directory-count').innerText = state.members.length;
 
@@ -625,11 +617,8 @@
             `;
 
             const wrapper = document.getElementById('tree-nodes-wrapper');
-
-            // Find child nodes to separate unconnected lineages
             const childIds = new Set(state.unions.flatMap(u => u.children || []));
             
-            // Render ancestral grand-roots
             const rootUnions = state.unions.filter(u => !childIds.has(u.partnerA) && !childIds.has(u.partnerB));
             const rootIsolated = state.members.filter(m => {
                 const inUnion = state.unions.some(u => u.partnerA === m.id || u.partnerB === m.id);
@@ -639,8 +628,6 @@
             rootUnions.forEach(u => { wrapper.innerHTML += buildTreeHTML(u, false); });
             rootIsolated.forEach(im => { wrapper.innerHTML += buildTreeHTML(im, false); });
 
-            // CRITICAL OVERHAUL: Ensure intermediate specific sub-lineage block trees are dynamically pinned 
-            // if nested deep within structural layout components
             const targetLineages = ['u_1779288131862', 'u2'];
             targetLineages.forEach(unionId => {
                 const targetUnion = state.unions.find(u => u.id === unionId);
@@ -654,7 +641,6 @@
             });
         }
 
-        // Form Submit Management
         document.getElementById('member-form').addEventListener('submit', function(e) {
             e.preventDefault();
             const nameField = document.getElementById('member-name');
@@ -708,120 +694,74 @@
             }
         }
 
-        function getFullCanvasBounds() {
-            const target = document.getElementById('canvas-content');
-            return {
-                width: target.scrollWidth + 140,
-                height: target.scrollHeight + 140
-            };
-        }
-
+        // FIXED EXPORT PIXEL VECTOR PNG TRANSLATION ENGINE
         function exportPNG() {
-            const mainLayout = document.getElementById('main-layout');
-            const canvasContainer = document.getElementById('canvas-container');
             const target = document.getElementById('canvas-content');
             const btn = document.querySelector('button[onclick="exportPNG()"]');
-            btn.innerText = "Capturing...";
+            btn.innerText = "Generating Vectors...";
+
+            // Capture exact styles used to preserve typography and luxury color mapping
+            const tailwindStyles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
+                .map(style => style.outerHTML).join('\n');
+
+            // Clone target tree workspace structure cleanly
+            const workspaceClone = target.cloneNode(true);
             
-            const prevLayoutOverflow = mainLayout.style.overflow;
-            const prevContainerOverflow = canvasContainer.style.overflow;
-            const prevContainerWidth = canvasContainer.style.width;
-            const prevContainerHeight = canvasContainer.style.height;
+            // Remove interactive editor hints from the exported image vector frame smoothly
+            workspaceClone.querySelectorAll('.no-print').forEach(el => el.remove());
 
-            mainLayout.style.overflow = 'visible';
-            canvasContainer.style.overflow = 'visible';
-            canvasContainer.style.width = 'auto';
-            canvasContainer.style.height = 'auto';
+            // Build structural XML surface bounds parameters
+            const canvasWidth = target.scrollWidth + 80;
+            const canvasHeight = target.scrollHeight + 80;
 
-            const bounds = getFullCanvasBounds();
+            const svgString = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="${canvasWidth}" height="${canvasHeight}">
+                    <foreignObject width="100%" height="100%">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="background-color: #120f0a; width: ${canvasWidth}px; height: ${canvasHeight}px; padding: 40px; box-sizing: border-box;">
+                            ${tailwindStyles}
+                            <div class="w-full flex flex-col items-center justify-start text-[#eadeca]">
+                                ${workspaceClone.innerHTML}
+                            </div>
+                        </div>
+                    </foreignObject>
+                </svg>
+            `;
 
-            html2canvas(target, { 
-                backgroundColor: '#120f0a', 
-                scale: 2, 
-                logging: false,
-                width: bounds.width,
-                height: bounds.height,
-                windowWidth: bounds.width,
-                windowHeight: bounds.height,
-                x: 0,
-                y: 0
-            }).then(canvas => {
-                const downloadLink = document.createElement('a');
-                downloadLink.download = 'vamsham-family-tree.png';
-                downloadLink.href = canvas.toDataURL('image/png');
-                downloadLink.click();
+            // Convert to base64 DataURL representation smoothly
+            const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+            const URL = window.URL || window.webkitURL || window;
+            const blobUrl = URL.createObjectURL(svgBlob);
+
+            // Construct drawing canvas to compile modern PNG stream cleanly
+            const imageContainer = new Image();
+            imageContainer.onload = function() {
+                const drawingSurface = document.createElement('canvas');
+                drawingSurface.width = canvasWidth * 2; // HD Resolution scaling
+                drawingSurface.height = canvasHeight * 2;
                 
-                mainLayout.style.overflow = prevLayoutOverflow;
-                canvasContainer.style.overflow = prevContainerOverflow;
-                canvasContainer.style.width = prevContainerWidth;
-                canvasContainer.style.height = prevContainerHeight;
+                const context = drawingSurface.getContext('2d');
+                context.scale(2, 2); // Enforce vector crispness allocation
+                context.drawImage(imageContainer, 0, 0);
+
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.download = 'vamsham-family-tree.png';
+                downloadAnchor.href = drawingSurface.toDataURL('image/png');
+                downloadAnchor.click();
+
+                URL.revokeObjectURL(blobUrl);
                 btn.innerText = "Export PNG";
-            }).catch(err => {
-                mainLayout.style.overflow = prevLayoutOverflow;
-                canvasContainer.style.overflow = prevContainerOverflow;
-                canvasContainer.style.width = prevContainerWidth;
-                canvasContainer.style.height = prevContainerHeight;
-                alert("PNG capture configuration internal error.");
+            };
+
+            imageContainer.onerror = function() {
+                alert("Vector matrix compilation encountered an error. Please fallback to PDF print engine mapping shortcut.");
                 btn.innerText = "Export PNG";
-            });
+            };
+
+            imageContainer.src = blobUrl;
         }
 
         function exportPDF() {
-            const mainLayout = document.getElementById('main-layout');
-            const canvasContainer = document.getElementById('canvas-container');
-            const target = document.getElementById('canvas-content');
-            const btn = document.querySelector('button[onclick="exportPDF()"]');
-            const originalText = btn.innerText;
-            btn.innerText = "Preparing PDF...";
-
-            const prevLayoutOverflow = mainLayout.style.overflow;
-            const prevContainerOverflow = canvasContainer.style.overflow;
-            const prevContainerWidth = canvasContainer.style.width;
-            const prevContainerHeight = canvasContainer.style.height;
-
-            mainLayout.style.overflow = 'visible';
-            canvasContainer.style.overflow = 'visible';
-            canvasContainer.style.width = 'auto';
-            canvasContainer.style.height = 'auto';
-
-            const bounds = getFullCanvasBounds();
-
-            html2canvas(target, { 
-                backgroundColor: '#120f0a', 
-                scale: 2.5, 
-                logging: false,
-                width: bounds.width,
-                height: bounds.height,
-                windowWidth: bounds.width,
-                windowHeight: bounds.height,
-                x: 0,
-                y: 0
-            }).then(canvas => {
-                const printWrapper = document.getElementById('print-wrapper');
-                printWrapper.innerHTML = ''; 
-                
-                const img = document.createElement('img');
-                img.src = canvas.toDataURL('image/png');
-                printWrapper.appendChild(img);
-
-                setTimeout(() => {
-                    window.print();
-                    mainLayout.style.overflow = prevLayoutOverflow;
-                    canvasContainer.style.overflow = prevContainerOverflow;
-                    canvasContainer.style.width = prevContainerWidth;
-                    canvasContainer.style.height = prevContainerHeight;
-                    btn.innerText = originalText;
-                    printWrapper.innerHTML = ''; 
-                }, 400);
-
-            }).catch(err => {
-                mainLayout.style.overflow = prevLayoutOverflow;
-                canvasContainer.style.overflow = prevContainerOverflow;
-                canvasContainer.style.width = prevContainerWidth;
-                canvasContainer.style.height = prevContainerHeight;
-                alert("PDF system printing compilation driver failed.");
-                btn.innerText = originalText;
-            });
+            window.print();
         }
 
         // Initialize App Workflow Sequence
