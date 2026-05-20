@@ -79,113 +79,115 @@
 
     <div id="main-layout" class="flex flex-col md:flex-row h-[calc(100vh-61px)] md:h-screen w-screen overflow-hidden relative">
         
-        <div class="no-print fixed md:relative inset-y-0 left-0 z-30 w-80 bg-[#1a1610] border-r border-[#2a241a] flex flex-col justify-between p-5 shadow-2xl shrink-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out h-full">
-            <div class="flex flex-col h-[calc(100vh-190px)] md:h-[calc(100vh-175px)]">
+        <div class="no-print fixed md:relative inset-y-0 left-0 z-30 w-80 bg-[#1a1610] border-r border-[#2a241a] flex flex-col justify-between shadow-2xl shrink-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out h-full">
+            
+            <div class="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-4">
+                
                 <div class="mb-4 flex justify-between items-center shrink-0">
                     <div>
                         <h1 class="text-2xl font-serif tracking-widest text-[#d4af37] font-bold hidden md:block">VAMSHAM</h1>
                         <p class="text-[10px] text-amber-200/40 uppercase tracking-widest">Family Tree Workspace</p>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span class="bg-[#2a2318] text-[#d4af37] border border-[#d4af37]/30 text-xs px-2 py-0.5 rounded-full font-mono">v2.6</span>
+                        <span class="bg-[#2a2318] text-[#d4af37] border border-[#d4af37]/30 text-xs px-2 py-0.5 rounded-full font-mono">v2.7</span>
                         <button onclick="toggleMobileSidebar()" class="md:hidden text-gray-400 text-sm p-1">✕ Close</button>
                     </div>
                 </div>
 
-                <div class="flex-1 overflow-y-auto custom-scrollbar pr-1 space-y-4">
-                    <form id="member-form" class="space-y-3 bg-[#221d15] p-3 rounded-lg border border-[#383023]">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-amber-400/80">Add Family Member</h3>
-                        
-                        <input 
-                            type="text" 
-                            id="member-name"
-                            placeholder="Full Name" 
-                            class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none focus:border-[#d4af37] text-amber-100"
-                            required
-                        />
+                <form id="member-form" class="space-y-3 bg-[#221d15] p-3 rounded-lg border border-[#383023]">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-amber-400/80">Add Family Member</h3>
+                    
+                    <input 
+                        type="text" 
+                        id="member-name"
+                        placeholder="Full Name" 
+                        class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none focus:border-[#d4af37] text-amber-100"
+                        required
+                    />
 
-                        <div>
-                            <label class="text-[10px] text-amber-200/50 block mb-1">Gender</label>
-                            <div class="grid grid-cols-2 gap-1 bg-[#120f0a] p-1 rounded border border-[#44392a]">
-                                <button type="button" onclick="setGender('M')" id="btn-gender-m" class="text-[10px] py-1 rounded transition-all bg-[#d4af37] text-[#120f0a] font-bold">Male</button>
-                                <button type="button" onclick="setGender('F')" id="btn-gender-f" class="text-[10px] py-1 rounded transition-all text-gray-400">Female</button>
-                            </div>
+                    <div>
+                        <label class="text-[10px] text-amber-200/50 block mb-1">Gender</label>
+                        <div class="grid grid-cols-2 gap-1 bg-[#120f0a] p-1 rounded border border-[#44392a]">
+                            <button type="button" onclick="setGender('M')" id="btn-gender-m" class="text-[10px] py-1 rounded transition-all bg-[#d4af37] text-[#120f0a] font-bold">Male</button>
+                            <button type="button" onclick="setGender('F')" id="btn-gender-f" class="text-[10px] py-1 rounded transition-all text-gray-400">Female</button>
                         </div>
-
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="text-[10px] text-amber-200/50 block mb-1">Birth Year</label>
-                                <input 
-                                    type="number" 
-                                    id="member-birth"
-                                    placeholder="e.g. 1950" 
-                                    class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none focus:border-[#d4af37] text-amber-100"
-                                />
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-amber-200/50 block mb-1">Death Year (Optional)</label>
-                                <input 
-                                    type="number" 
-                                    id="member-death"
-                                    placeholder="Leave blank if alive" 
-                                    class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none focus:border-[#d4af37] text-amber-100"
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="text-[10px] text-amber-200/50 block mb-1">Bio / Historic Info</label>
-                            <textarea 
-                                id="member-bio"
-                                rows="2"
-                                placeholder="Short notes, profession, or origins..." 
-                                class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none focus:border-[#d4af37] text-amber-100 custom-scrollbar resize-none"
-                            ></textarea>
-                        </div>
-
-                        <div class="grid grid-cols-3 gap-1 bg-[#120f0a] p-1 rounded border border-[#44392a]">
-                            <button type="button" onclick="setLinkType('none')" id="btn-link-none" class="text-[10px] py-1 rounded transition-all bg-[#d4af37] text-[#120f0a] font-bold">Standalone</button>
-                            <button type="button" onclick="setLinkType('spouse')" id="btn-link-spouse" class="text-[10px] py-1 rounded transition-all text-gray-400">Is Spouse</button>
-                            <button type="button" onclick="setLinkType('child')" id="btn-link-child" class="text-[10px] py-1 rounded transition-all text-gray-400">Is Child</button>
-                        </div>
-
-                        <div id="target-selector-container" class="hidden">
-                            <select 
-                                id="target-member-id"
-                                class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none text-amber-200/80"
-                            >
-                            </select>
-                        </div>
-
-                        <button type="submit" class="w-full bg-[#d4af37] text-[#120f0a] text-xs font-bold py-2 rounded flex items-center justify-center gap-1 hover:bg-[#e6c24a] transition-all cursor-pointer">
-                            + Insert Node
-                        </button>
-                    </form>
-
-                    <div class="space-y-1">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-amber-500/50 mb-2">Indexed Directory (<span id="directory-count">0</span>)</h3>
-                        <div id="directory-list" class="space-y-1.5"></div>
                     </div>
-                </div>
-            </div>
 
-            <div class="space-y-2 pt-3 border-t border-[#2a241a] shrink-0 bg-[#1a1610]">
-                <div class="bg-[#16120d] p-2 rounded-lg border border-[#2d251c] space-y-1.5">
-                    <p class="text-[10px] font-bold uppercase tracking-wider text-amber-500/40 text-center">Data Portability</p>
-                    <div class="grid grid-cols-2 gap-1.5 text-[11px]">
-                        <button onclick="exportJSONData()" class="bg-[#221d15] p-1.5 rounded text-center border border-[#3c3325] text-amber-200 hover:text-white hover:bg-[#2d261d] transition-all cursor-pointer">Export Data</button>
-                        <button onclick="triggerJSONImport()" class="bg-[#221d15] p-1.5 rounded text-center border border-[#3c3325] text-amber-200 hover:text-white hover:bg-[#2d261d] transition-all cursor-pointer">Import Data</button>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-[10px] text-amber-200/50 block mb-1">Birth Year</label>
+                            <input 
+                                type="number" 
+                                id="member-birth"
+                                placeholder="e.g. 1950" 
+                                class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none focus:border-[#d4af37] text-amber-100"
+                            />
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-amber-200/50 block mb-1">Death Year (Optional)</label>
+                            <input 
+                                type="number" 
+                                id="member-death"
+                                placeholder="Leave blank if alive" 
+                                class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none focus:border-[#d4af37] text-amber-100"
+                            />
+                        </div>
                     </div>
-                    <input type="file" id="import-file-element" accept=".json" class="hidden" onchange="handleJSONImport(event)" />
+
+                    <div>
+                        <label class="text-[10px] text-amber-200/50 block mb-1">Bio / Historic Info</label>
+                        <textarea 
+                            id="member-bio"
+                            rows="2"
+                            placeholder="Short notes, profession, or origins..." 
+                            class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none focus:border-[#d4af37] text-amber-100 custom-scrollbar resize-none"
+                        ></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-1 bg-[#120f0a] p-1 rounded border border-[#44392a]">
+                        <button type="button" onclick="setLinkType('none')" id="btn-link-none" class="text-[10px] py-1 rounded transition-all bg-[#d4af37] text-[#120f0a] font-bold">Standalone</button>
+                        <button type="button" onclick="setLinkType('spouse')" id="btn-link-spouse" class="text-[10px] py-1 rounded transition-all text-gray-400">Is Spouse</button>
+                        <button type="button" onclick="setLinkType('child')" id="btn-link-child" class="text-[10px] py-1 rounded transition-all text-gray-400">Is Child</button>
+                    </div>
+
+                    <div id="target-selector-container" class="hidden">
+                        <select 
+                            id="target-member-id"
+                            class="w-full bg-[#120f0a] border border-[#44392a] p-2 text-xs rounded focus:outline-none text-amber-200/80"
+                        >
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full bg-[#d4af37] text-[#120f0a] text-xs font-bold py-2 rounded flex items-center justify-center gap-1 hover:bg-[#e6c24a] transition-all cursor-pointer">
+                        + Insert Node
+                    </button>
+                </form>
+
+                <div class="space-y-1">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-amber-500/50 mb-2">Indexed Directory (<span id="directory-count">0</span>)</h3>
+                    <div id="directory-list" class="space-y-1.5"></div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2 text-xs">
-                    <button onclick="exportPNG()" class="bg-[#221d15] p-2 rounded text-center border border-[#332b20] hover:bg-[#2e271d] hover:text-[#d4af37] transition-all cursor-pointer font-medium">Export PNG</button>
-                    <button onclick="exportPDF()" class="bg-[#221d15] p-2 rounded text-center border border-[#332b20] hover:bg-[#2e271d] hover:text-[#d4af37] transition-all cursor-pointer font-medium">Export PDF</button>
+                <div class="space-y-3 pt-3 border-t border-[#2a241a] bg-[#1a1610]">
+                    <div class="bg-[#16120d] p-2 rounded-lg border border-[#2d251c] space-y-1.5">
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-amber-500/40 text-center">Data Portability</p>
+                        <div class="grid grid-cols-2 gap-1.5 text-[11px]">
+                            <button onclick="exportJSONData()" class="bg-[#221d15] p-1.5 rounded text-center border border-[#3c3325] text-amber-200 hover:text-white hover:bg-[#2d261d] transition-all cursor-pointer">Export Data</button>
+                            <button onclick="triggerJSONImport()" class="bg-[#221d15] p-1.5 rounded text-center border border-[#3c3325] text-amber-200 hover:text-white hover:bg-[#2d261d] transition-all cursor-pointer">Import Data</button>
+                        </div>
+                        <input type="file" id="import-file-element" accept=".json" class="hidden" onchange="handleJSONImport(event)" />
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <button onclick="exportPNG()" class="bg-[#221d15] p-2 rounded text-center border border-[#332b20] hover:bg-[#2e271d] hover:text-[#d4af37] transition-all cursor-pointer font-medium">Export PNG</button>
+                        <button onclick="exportPDF()" class="bg-[#221d15] p-2 rounded text-center border border-[#332b20] hover:bg-[#2e271d] hover:text-[#d4af37] transition-all cursor-pointer font-medium">Export PDF</button>
+                    </div>
+                    
+                    <button onclick="clearAllData()" class="w-full bg-red-950/40 text-red-400 hover:bg-red-900/80 border border-red-900/40 text-xs p-2.5 rounded text-center transition-all cursor-pointer font-bold tracking-wide shadow-inner">
+                        Reset to Code Baseline
+                    </button>
                 </div>
-                <button onclick="clearAllData()" class="w-full bg-red-950/40 text-red-400 hover:bg-red-900/60 border border-red-900/40 text-xs p-2 rounded text-center transition-all cursor-pointer font-medium">
-                    Reset to Code Baseline
-                </button>
+
             </div>
         </div>
 
@@ -193,7 +195,7 @@
             <div id="canvas-content" class="w-max px-6 md:px-16 mx-auto flex flex-col items-center justify-start min-h-[75vh] space-y-12 py-4"></div>
 
             <div class="no-print w-full flex justify-between items-center text-[11px] text-amber-100/40 border-t border-[#221d15] pt-4 mt-8 shrink-0">
-                <p>Vamsham Node Sandbox Engine (Production Dataset 2.6 Live)</p>
+                <p>Vamsham Node Sandbox Engine (Production Dataset 2.7 Live)</p>
                 <p class="hidden md:block">Press Ctrl+P / Cmd+P alternative target shortcut</p>
             </div>
         </div>
@@ -456,12 +458,8 @@
             return death ? `(${birth} — ${death})` : `(b. ${birth})`;
         }
 
-        function getGenderClasses(gender) {
-            if (gender === 'F') {
-                return { text: 'text-pink-200', subtext: 'text-pink-400/60', border: 'border-pink-500/30' };
-            }
-            return { text: 'text-blue-200', subtext: 'text-blue-400/60', border: 'border-blue-500/30' };
-        }
+        // FIXED: Balanced responsive pink accents
+        getGenderClasses = (gender) => gender === 'F' ? { text: 'text-pink-200', subtext: 'text-pink-400/60', border: 'border-pink-500/30' } : { text: 'text-blue-200', subtext: 'text-blue-400/60', border: 'border-blue-500/30' };
 
         function openEditModal(id) {
             if(!id) return;
@@ -582,7 +580,7 @@
                             <div onclick="openEditModal('${partnerB ? partnerB.id : ''}')" class="cursor-pointer text-center w-[135px] md:w-[165px] flex flex-col justify-between p-1 rounded hover:bg-[#221d15]/50 transition-colors">
                                 <div>
                                     <p class="text-xs font-bold ${pBColors.text} tracking-wide truncate">${partnerB ? partnerB.name : 'Unknown/Removed'}</p>
-                                    <p class="text-[10px] ${pBColors.subtext} font-mono mt-0.5">${partnerB ? formatLifespan(partnerB.birth, partnerB.death) : ''}</p>
+                                    <p class="text-[10px] ${pBColors.subtext} font-mono mt-0.5">${partnerB ? formatLifespan(partnerB.birth, death) : ''}</p>
                                 </div>
                                 ${partnerB && partnerB.bio ? `<p class="text-[10px] text-gray-400 mt-2 border-t border-[#322a1e] pt-1 text-left italic leading-normal h-auto w-full break-words whitespace-normal">${partnerB.bio}</p>` : ''}
                             </div>
